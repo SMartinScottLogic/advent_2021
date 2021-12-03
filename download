@@ -1,0 +1,1 @@
+curl -fsS 'https://adventofcode.com/2021/day/1/input' --cookie 'session=your-cookie'
