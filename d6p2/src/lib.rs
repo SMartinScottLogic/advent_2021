@@ -36,15 +36,18 @@ impl FromStr for Solution {
 
 impl Solution {
     pub fn analyse(&mut self) {
-        for days in 1..=12 {
+        for days in 1..=256 {
             let mut new = 0;
-            let mut next_population: HashMap<i32, i64> = self.population.iter().map(|(timer, count)| {
-                match timer {
-                    0 => (6, count.to_owned()),
-                    v => (v-1, count.to_owned())
-                }
-            }).collect();
-            *next_population.entry(8).or_insert(0) = next_population.get(&6).unwrap_or(&0).to_owned();
+            let mut next_population: HashMap<i32, i64> = self.population.iter()
+            .fold(HashMap::new(), |mut acc, (timer, count)| {
+                let next_timer = match timer {
+                    0 => 6,
+                    v => v-1
+                };
+                *acc.entry(next_timer).or_insert(0) += count;
+                acc
+            });
+            *next_population.entry(8).or_insert(0) = self.population.get(&0).unwrap_or(&0).to_owned();
             self.population = next_population;
             println!("{} {:?}", days, self.answer());
         }
