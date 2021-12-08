@@ -1,4 +1,3 @@
-use std::cmp::{max, min};
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -16,9 +15,9 @@ pub fn load(filename: &str) -> Solution {
     for line in reader.lines() {
         let l = line
             .unwrap()
-            .split("|")
+            .split('|')
             .take(2)
-            .map(|v| Line::from_str(v).unwrap().to_owned())
+            .map(|v| Line::from_str(v).unwrap())
             .collect::<Vec<_>>();
 
         println!("{:?} => {:?}", l[0], l[1]);
@@ -68,7 +67,7 @@ impl Solution {
                 };
                 if value >= 0 {
                     mapping.entry(entry.clone()).or_insert(value);
-                    r_mapping.entry(value).or_insert(entry.clone());
+                    r_mapping.entry(value).or_insert_with(|| entry.clone());
                 }
             }
             let one = r_mapping
@@ -89,24 +88,22 @@ impl Solution {
                 if !mapping.contains_key(entry) {
                     let this = entry.iter().map(|v| v.to_owned()).collect::<HashSet<_>>();
                     let value = match entry.len() {
-                        6 => {
-                            if this.intersection(&four).count() == 4 {
-                                9
-                            } else if this.intersection(&one).count() == 2 {
-                                0
-                            } else {
-                                6
-                            }
-                        }
-                        5 => {
-                            if this.intersection(&one).count() == 2 {
-                                3
-                            } else if this.intersection(&four).count() == 2 {
-                                2
-                            } else {
-                                5
-                            }
-                        }
+                        6 => match (
+                            this.intersection(&four).count(),
+                            this.intersection(&one).count(),
+                        ) {
+                            (4, _) => 9,
+                            (_, 2) => 0,
+                            _ => 6,
+                        },
+                        5 => match (
+                            this.intersection(&one).count(),
+                            this.intersection(&four).count(),
+                        ) {
+                            (2, _) => 3,
+                            (_, 2) => 2,
+                            _ => 5,
+                        },
                         _ => panic!(),
                     };
                     if value >= 0 {
