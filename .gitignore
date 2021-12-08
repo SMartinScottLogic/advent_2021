@@ -11,5 +11,4 @@ Cargo.lock
 
 # Per-user data files
 input
-input.full
-input.small
+input.*
