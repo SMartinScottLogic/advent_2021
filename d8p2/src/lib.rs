@@ -5,13 +5,15 @@ use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::str::FromStr;
 
+use itertools::Itertools;
+
 pub fn load(filename: &str) -> Solution {
     let file = File::open(filename).unwrap();
 
     let reader = BufReader::new(file);
 
     let mut solution = Solution::new();
-    for line in reader.lines().take(1) {
+    for line in reader.lines() {
         let l = line
             .unwrap()
             .split("|")
@@ -34,7 +36,7 @@ pub struct Solution {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Line {
-    positions: Vec<HashSet<char>>,
+    positions: Vec<Vec<char>>,
 }
 
 impl Solution {
@@ -49,38 +51,126 @@ impl Solution {
         self.data.push((signal, output));
     }
 
+    pub fn analyse(&mut self) {
+        self.answer = 0;
+        for (input, output) in &self.data {
+            let mut mapping = HashMap::new();
+            let mut r_mapping = HashMap::new();
+            for entry in input.entry() {
+                let value = match entry.len() {
+                    2 => 1,
+                    3 => 7,
+                    4 => 4,
+                    5 => -1,
+                    6 => -1,
+                    7 => 8,
+                    _ => panic!(),
+                };
+                if value >= 0 {
+                    mapping.entry(entry.clone()).or_insert(value);
+                    r_mapping.entry(value).or_insert(entry.clone());
+                }
+            }
+            let one = r_mapping
+                .get(&1)
+                .unwrap()
+                .iter()
+                .map(|v| v.to_owned())
+                .collect::<HashSet<_>>();
+            let four = r_mapping
+                .get(&4)
+                .unwrap()
+                .iter()
+                .map(|v| v.to_owned())
+                .collect::<HashSet<_>>();
+            println!("mapping: {:?}", mapping);
+
+            for entry in input.entry() {
+                if !mapping.contains_key(entry) {
+                    let this = entry.iter().map(|v| v.to_owned()).collect::<HashSet<_>>();
+                    let value = match entry.len() {
+                        6 => {
+                            if this.intersection(&four).count() == 4 {
+                                9
+                            } else if this.intersection(&one).count() == 2 {
+                                0
+                            } else {
+                                6
+                            }
+                        }
+                        5 => {
+                            if this.intersection(&one).count() == 2 {
+                                3
+                            } else if this.intersection(&four).count() == 2 {
+                                2
+                            } else {
+                                5
+                            }
+                        }
+                        _ => panic!(),
+                    };
+                    if value >= 0 {
+                        mapping.entry(entry.clone()).or_insert(value);
+                    }
+                }
+            }
+
+            println!("mapping: {:?}", mapping);
+
+            let mut line_score = 0;
+            for entry in output.entry() {
+                let digit = mapping.get(entry).unwrap();
+                line_score *= 10;
+                line_score += digit;
+            }
+            self.answer += line_score;
+        }
+        println!("{}", self.answer);
+    }
+
     /*
     1 : [ ,  , c,  ,  , f,  ] = 2
     7 : [a,  , c,  ,  , f,  ] = 3
     4 : [ , b, c, d,  , f,  ] = 4
+
     2 : [a,  , c, d, e,  , g] = 5
     3 : [a,  , c, d,  , f, g] = 5
     5 : [a, b,  , d,  , f, g] = 5
+    ALL5 : [a, d, g]
+    PARTIAL5: [b, c, e, f]
+
     0 : [a, b, c,  , e, f, g] = 6
     6 : [a, b,  , d, e, f, g] = 6
     9 : [a, b, c, d,  , f, g] = 6
+    ALL6: [a, b, f, g]
+    PARTIAL6: [c, d, e]
     8 : [a, b, c, d, e, f, g] = 7
+        [8, 6, 8, 7, 4, 9, 7]
+
+    Computed: a, d, g
      */
-    pub fn analyse(&mut self) {
+    /*
+    pub fn analyse_borked(&mut self) {
         self.answer = 0;
         for (input, output) in &self.data {
             let mut mapping: HashMap<_, _> = ('a'..='g')
-                .map(|k| (k, ('a'..'g').collect::<Vec<_>>()))
+                .map(|k| (k, ('a'..'g').collect::<HashSet<_>>()))
                 .collect();
 
-            println!("mapping: {:?}", mapping);
-            println!("input: {:?}", input);
+            let mut two = HashSet::new();
+            let mut three = HashSet::new();
+            let mut four = HashSet::new();
+            let mut seven = HashSet::new();
             for single in input.entry() {
-                let len = single.len();
                 for digit in single {
-                    match len {
+                    match single.len() {
                         2 => {
                             // 1 only digit with 2 segments: [c, f]
                             mapping
                                 .get_mut(&digit)
                                 .unwrap()
                                 .retain(|v| *v == 'c' || *v == 'f');
-                            println!("mapping: {:?}", mapping);
+                            two.insert(*digit);
                         }
                         3 => {
                             // 7 only digit with 3 segments: [a, c, f]
@@ -88,25 +178,93 @@ impl Solution {
                                 .get_mut(&digit)
                                 .unwrap()
                                 .retain(|v| *v == 'a' || *v == 'c' || *v == 'f');
-                        },
+                            three.insert(*digit);
+                        }
                         4 => {
                             // 4 only digit with 4 segments: [b, c, d, f]
                             mapping
                                 .get_mut(&digit)
                                 .unwrap()
                                 .retain(|v| *v == 'b' || *v == 'c' || *v == 'd' || *v == 'f');
-                        },
-                        7 => {
-                            // 8 only digit with 7 segments: [a, b, c, d, e, f, g]
-                            // => retain all
-                        },
-                        _ => {}
+                            four.insert(*digit);
                         }
+                        7 => {
+                            seven.insert(*digit);
+                        }
+                        _ => {}
+                    }
                 }
             }
-            println!("{:?} => mapping: {:?}", (input, output), mapping);
+            println!("2:{:?} 3:{:?} 4:{:?}", two, three, four);
+            let a = three
+                .difference(&two)
+                .map(|v| v.to_owned())
+                .collect::<HashSet<_>>();
+            if a.len() != 1 {
+                panic!();
+            }
+            println!("a {:?}", a);
+            for diff in &a {
+                *mapping.entry(*diff).or_default() = HashSet::from(['a']);
+            }
+
+            let mut in4not2 = four
+                .difference(&two)
+                .map(|v| v.to_owned())
+                .collect::<HashSet<_>>();
+            let mut all5 = seven.clone();
+            let mut all6 = seven.clone();
+            println!("in4not2 {:?}", in4not2);
+
+            let mut d = in4not2.iter().map(|v| v.to_owned()).collect::<HashSet<_>>();
+            for single in input.entry() {
+                match single.len() {
+                5 => {
+                    d = single
+                        .intersection(&d)
+                        .map(|v| v.to_owned())
+                        .collect::<HashSet<_>>();
+                    all5 = all5
+                        .intersection(&single)
+                        .map(|v| v.to_owned())
+                        .collect::<HashSet<_>>();
+                },
+                6 => {
+                    all6 = all6
+                        .intersection(&single)
+                        .map(|v| v.to_owned())
+                        .collect::<HashSet<_>>();
+                    seven.difference(&single);
+                },
+                _ => {}
+            }
+
+            }
+            println!("d {:?}", d);
+            if d.len() != 1 {
+                panic!();
+            }
+            for diff in &d {
+                *mapping.entry(*diff).or_default() = HashSet::from(['d']);
+            }
+
+            println!("all5 {:?}", all5);
+
+            let g = all5.difference(&d).map(|v| v.to_owned()).collect::<HashSet<_>>()
+            .difference(&a).map(|v| v.to_owned()).collect::<HashSet<_>>();
+            if g.len() != 1 {
+                panic!();
+            }
+            println!("g {:?}", g);
+
+            println!("all6 {:?}", all6);
+
+            println!("input  {:?}", input);
+            println!("output {:?}", output);
+            println!(" => mapping: {:?}", mapping);
         }
     }
+    */
 
     pub fn answer(&self) -> i64 {
         self.answer as i64
@@ -114,7 +272,7 @@ impl Solution {
 }
 
 impl Line {
-    fn entry(&self) -> impl Iterator<Item = &HashSet<char>> + '_ {
+    fn entry(&self) -> impl Iterator<Item = &Vec<char>> + '_ {
         self.positions.iter()
     }
 }
@@ -126,7 +284,7 @@ impl FromStr for Line {
         let positions = s
             .trim()
             .split_whitespace()
-            .map(|v| v.chars().collect::<HashSet<_>>())
+            .map(|v| v.chars().sorted().collect::<Vec<_>>())
             .collect::<Vec<_>>();
 
         Ok(Line { positions })
