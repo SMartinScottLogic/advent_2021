@@ -1,6 +1,7 @@
 [workspace]
 
 members = [
+    "utils",
     "template",
     "d1p1",
     "d1p2",

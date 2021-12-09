@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::str::FromStr;
+use utils::Matrix;
 
 use itertools::Itertools;
 
@@ -13,8 +14,14 @@ pub fn load(filename: &str) -> Solution {
     let reader = BufReader::new(file);
 
     let mut solution = Solution::new();
-    for line in reader.lines() {
-        solution.add(Line::from_str(&line.unwrap()).unwrap());
+    for (y, line) in reader.lines().enumerate() {
+        let line = line.unwrap();
+        for (x, value) in line.trim()
+        .chars()
+        .map(|v| v.to_string())
+        .map(|v| v.parse::<i64>().unwrap()).enumerate() {
+            solution.add(x.try_into().unwrap(), y.try_into().unwrap(), value);
+        }
     }
 
     solution
@@ -22,45 +29,34 @@ pub fn load(filename: &str) -> Solution {
 
 #[derive(Debug)]
 pub struct Solution {
-    data: Vec<Line>,
+    data: Matrix,
     answer: i64,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Line {
-    positions: Vec<u8>,
 }
 
 impl Solution {
     fn new() -> Self {
         Self {
-            data: Vec::new(),
+            data: Matrix::new(),
             answer: 0i64,
         }
     }
 
-    fn add(&mut self, signal: Line) {
-        self.data.push(signal);
+    fn add(&mut self, x: isize, y: isize, value: i64) {
+        self.data.set(x, y, value)
     }
 
-    fn get(&self, x: i64, y: i64) -> Option<u8> {
-        if x < 0 || y < 0 {
-            None
-        } else {
-            self.data
-                .get(y as usize)
-                .and_then(|l| l.positions.get(x as usize))
+    fn get(&self, x: isize, y: isize) -> Option<i64> {
+        self.data.get(x, y)
                 .and_then(|v| Some(v.to_owned()))
-        }
     }
 
     pub fn analyse(&mut self) {
         self.answer = 0;
         let mut seed = Vec::new();
-        for (y, xdata) in self.data.iter().enumerate() {
-            for (x, height) in xdata.entry().enumerate() {
-                let x = x as i64;
-                let y = y as i64;
+        let (xsize, ysize) = self.data.dimensions();
+        for y in 0..=ysize {
+            for x in 0..=xsize {
+                let height = self.data.get(x, y).unwrap();
                 //println!("({} {}) => {}", x, y, height);
                 let mut lowest = true;
                 // Above
@@ -138,45 +134,8 @@ impl Solution {
         println!("{}", self.answer);
     }
 
-    /*
-    1 : [ ,  , c,  ,  , f,  ] = 2
-    7 : [a,  , c,  ,  , f,  ] = 3
-    4 : [ , b, c, d,  , f,  ] = 4
-
-    2 : [a,  , c, d, e,  , g] = 5
-    3 : [a,  , c, d,  , f, g] = 5
-    5 : [a, b,  , d,  , f, g] = 5
-
-    0 : [a, b, c,  , e, f, g] = 6
-    6 : [a, b,  , d, e, f, g] = 6
-    9 : [a, b, c, d,  , f, g] = 6
-
-    8 : [a, b, c, d, e, f, g] = 7
-        [8, 6, 8, 7, 4, 9, 7]
-     */
-
     pub fn answer(&self) -> i64 {
         self.answer as i64
     }
 }
 
-impl Line {
-    fn entry(&self) -> impl Iterator<Item = &u8> + '_ {
-        self.positions.iter()
-    }
-}
-
-impl FromStr for Line {
-    type Err = ParseIntError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let positions = s
-            .trim()
-            .chars()
-            .map(|v| v.to_string())
-            .map(|v| v.parse::<u8>().unwrap())
-            .collect::<Vec<_>>();
-
-        Ok(Line { positions })
-    }
-}
