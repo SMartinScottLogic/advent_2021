@@ -1,4 +1,3 @@
-use std::cmp::{max, min};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -39,7 +38,6 @@ impl FromStr for Solution {
 impl Solution {
     pub fn analyse(&mut self) {
         for days in 1..=256 {
-            let mut new = 0;
             let mut next_population: HashMap<i32, i64> =
                 self.population
                     .iter()

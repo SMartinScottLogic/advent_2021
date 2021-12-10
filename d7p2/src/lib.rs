@@ -1,4 +1,3 @@
-use std::cmp::{max, min};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -46,14 +45,14 @@ impl Solution {
         let min = self
             .population
             .iter()
-            .map(|(p, c)| p)
+            .map(|(p, _c)| p)
             .min()
             .unwrap()
             .to_owned();
         let max = self
             .population
             .iter()
-            .map(|(p, c)| p)
+            .map(|(p, _c)| p)
             .max()
             .unwrap()
             .to_owned();

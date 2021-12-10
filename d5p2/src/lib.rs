@@ -50,7 +50,7 @@ impl Solution {
 
             if line_segment.is_horizontal() {
                 let start_x = min(line_segment.start.x, line_segment.end.x);
-                let start_y = min(line_segment.start.y, line_segment.end.y);
+                let _start_y = min(line_segment.start.y, line_segment.end.y);
                 let end_x = max(line_segment.start.x, line_segment.end.x);
                 let end_y = max(line_segment.start.y, line_segment.end.y);
                 let y = end_y;
@@ -59,7 +59,7 @@ impl Solution {
                     *self.scores.entry((x, y)).or_insert(0) += 1;
                 }
             } else if line_segment.is_vertical() {
-                let start_x = min(line_segment.start.x, line_segment.end.x);
+                let _start_x = min(line_segment.start.x, line_segment.end.x);
                 let start_y = min(line_segment.start.y, line_segment.end.y);
                 let end_x = max(line_segment.start.x, line_segment.end.x);
                 let end_y = max(line_segment.start.y, line_segment.end.y);

@@ -33,7 +33,6 @@ impl Matrix {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use std::ops::Add;
 
     #[test]
     fn it_works() {
