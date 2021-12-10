@@ -5,7 +5,6 @@ use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
 
 fn main() {
-
     let filename = "input";
 
     // Open the file in read-only mode (ignoring errors).
@@ -14,42 +13,55 @@ fn main() {
 
     let reader = BufReader::new(file);
 
-
     let data: Vec<String> = reader.lines().map(|v| v.unwrap()).collect();
     println!("{:?}", data);
 
     let mut oxygen: Vec<String> = data.iter().map(|v| v.clone()).collect();
     let mut index = 0;
-    while oxygen.len() > 1 
-    {
+    while oxygen.len() > 1 {
         let p = oxygen.iter().fold(HashMap::new(), |mut acc, v| {
             *acc.entry(v.as_bytes()[index] as char).or_insert(0) += 1;
             acc
         });
-        let mut most_common_value = p.iter().max_by(|a, b| a.1.cmp(&b.1)).map(|(k, _v)| k).unwrap();
-        if p.get(&'0')!=None && p.get(&'1')!=None && p[&'0'] == p[&'1'] {
+        let mut most_common_value = p
+            .iter()
+            .max_by(|a, b| a.1.cmp(&b.1))
+            .map(|(k, _v)| k)
+            .unwrap();
+        if p.get(&'0') != None && p.get(&'1') != None && p[&'0'] == p[&'1'] {
             most_common_value = &'1';
         }
         println!("{:?} {}", p, most_common_value);
-        let next_oxygen: Vec<String> = oxygen.iter().filter(|v| v.as_bytes()[index] as char == *most_common_value).map(|v| v.to_owned()).collect();
+        let next_oxygen: Vec<String> = oxygen
+            .iter()
+            .filter(|v| v.as_bytes()[index] as char == *most_common_value)
+            .map(|v| v.to_owned())
+            .collect();
         println!("next: {} {:?}", index, next_oxygen);
         oxygen = next_oxygen;
         index += 1;
     }
     let mut co2: Vec<String> = data.iter().map(|v| v.clone()).collect();
     let mut index = 0;
-    while co2.len() > 1 
-    {
+    while co2.len() > 1 {
         let p = co2.iter().fold(HashMap::new(), |mut acc, v| {
             *acc.entry(v.as_bytes()[index] as char).or_insert(0) += 1;
             acc
         });
-        let mut least_common_value = p.iter().min_by(|a, b| a.1.cmp(&b.1)).map(|(k, _v)| k).unwrap();
-        if p.get(&'0')!=None && p.get(&'1')!=None && p[&'0'] == p[&'1'] {
+        let mut least_common_value = p
+            .iter()
+            .min_by(|a, b| a.1.cmp(&b.1))
+            .map(|(k, _v)| k)
+            .unwrap();
+        if p.get(&'0') != None && p.get(&'1') != None && p[&'0'] == p[&'1'] {
             least_common_value = &'0';
         }
         println!("{:?} {}", p, least_common_value);
-        let next_co2: Vec<String> = co2.iter().filter(|v| v.as_bytes()[index] as char == *least_common_value).map(|v| v.to_owned()).collect();
+        let next_co2: Vec<String> = co2
+            .iter()
+            .filter(|v| v.as_bytes()[index] as char == *least_common_value)
+            .map(|v| v.to_owned())
+            .collect();
         println!("next: {} {:?}", index, next_co2);
         co2 = next_co2;
         index += 1;

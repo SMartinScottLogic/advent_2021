@@ -6,15 +6,14 @@ fn sum(values: &[Result<String, std::io::Error>]) -> i32 {
     let mut total = 0;
     for v in values {
         if let Ok(value) = v {
-        let reading: i32 = value.parse().unwrap();
-        total += reading;
+            let reading: i32 = value.parse().unwrap();
+            total += reading;
         }
     }
     total
 }
 
 fn main() {
-
     let filename = "input";
 
     // Open the file in read-only mode (ignoring errors).
@@ -54,5 +53,4 @@ fn main() {
     }
     */
     println!("Count = {}", count);
-
 }

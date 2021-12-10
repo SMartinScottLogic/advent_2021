@@ -1,9 +1,9 @@
+use std::cmp::{max, min};
+use std::collections::HashMap;
 use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::str::FromStr;
-use std::cmp::{min, max};
-use std::io::{BufRead, BufReader};
-use std::collections::HashMap;
 
 pub fn load(filename: &str) -> Solution {
     let file = File::open(filename).unwrap();
@@ -21,7 +21,7 @@ pub fn load(filename: &str) -> Solution {
 #[derive(Debug)]
 pub struct Solution {
     line_segments: Vec<LineSegment>,
-    scores: HashMap<(i32, i32), i32>
+    scores: HashMap<(i32, i32), i32>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -57,7 +57,7 @@ impl Solution {
                 for x in start_x..=end_x {
                     println!("({}, {})", x, y);
                     *self.scores.entry((x, y)).or_insert(0) += 1;
-                }                
+                }
             } else if line_segment.is_vertical() {
                 let start_x = min(line_segment.start.x, line_segment.end.x);
                 let start_y = min(line_segment.start.y, line_segment.end.y);
@@ -67,13 +67,29 @@ impl Solution {
                 for y in start_y..=end_y {
                     println!("({}, {})", x, y);
                     *self.scores.entry((x, y)).or_insert(0) += 1;
-                }                
+                }
             } else {
                 let reverse = line_segment.start.x > line_segment.end.x;
-                let start_x = if reverse {line_segment.end.x } else { line_segment.start.x };
-                let start_y = if reverse {line_segment.end.y } else { line_segment.start.y };
-                let end_x = if reverse { line_segment.start.x } else { line_segment.end.x };
-                let end_y = if reverse { line_segment.start.y } else { line_segment.end.y };
+                let start_x = if reverse {
+                    line_segment.end.x
+                } else {
+                    line_segment.start.x
+                };
+                let start_y = if reverse {
+                    line_segment.end.y
+                } else {
+                    line_segment.start.y
+                };
+                let end_x = if reverse {
+                    line_segment.start.x
+                } else {
+                    line_segment.end.x
+                };
+                let end_y = if reverse {
+                    line_segment.start.y
+                } else {
+                    line_segment.end.y
+                };
                 println!("({}, {}) -> ({}, {})", start_x, start_y, end_x, end_y);
                 let mut delta = 1;
                 if end_y < start_y {

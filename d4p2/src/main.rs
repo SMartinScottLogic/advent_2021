@@ -2,22 +2,27 @@ use std::fs::File;
 
 use std::io::{BufRead, BufReader};
 
-
 #[derive(Debug)]
 struct Grid {
     complete_idx: i64,
     data: Vec<Vec<(String, bool)>>,
     num_row: usize,
     num_col: usize,
-    last_draw: String
+    last_draw: String,
 }
 
 impl Grid {
     fn new() -> Grid {
-        Grid {complete_idx: -1, data: Vec::new(), num_row: 0, num_col: 0, last_draw: "".to_string()}
+        Grid {
+            complete_idx: -1,
+            data: Vec::new(),
+            num_row: 0,
+            num_col: 0,
+            last_draw: "".to_string(),
+        }
     }
 
-    fn clone(&self, cell_adjuster: &dyn Fn((String, bool), i64)->(String, bool)) -> Self {
+    fn clone(&self, cell_adjuster: &dyn Fn((String, bool), i64) -> (String, bool)) -> Self {
         let mut new_grid = Grid::new();
         new_grid.complete_idx = self.complete_idx;
         new_grid.num_row = self.data.len();
@@ -41,12 +46,11 @@ impl Grid {
     }
 
     fn mark(&self, draw: &str) -> Grid {
-        self.clone(&|cell: (String, bool), complete_idx: i64| 
-            match cell {
-                    (v, marked) if complete_idx != -1 => (v, marked),
-                    (v, _marked) if v == draw => (v, true),
-                    (v, marked) => (v, marked)
-                })
+        self.clone(&|cell: (String, bool), complete_idx: i64| match cell {
+            (v, marked) if complete_idx != -1 => (v, marked),
+            (v, _marked) if v == draw => (v, true),
+            (v, marked) => (v, marked),
+        })
     }
 
     fn test_and_set_complete(&self, complete_idx: i64, last_draw: &str) -> Grid {
@@ -56,10 +60,10 @@ impl Grid {
         }
         let mut grid_win = false;
         // Rows
-            for row in 0..new_grid.num_row {
-                let mut row_win = true;
-                for col in 0..new_grid.num_col {
-                    if new_grid.data[row][col].1 != true {
+        for row in 0..new_grid.num_row {
+            let mut row_win = true;
+            for col in 0..new_grid.num_col {
+                if new_grid.data[row][col].1 != true {
                     row_win = false;
                 }
             }
@@ -114,7 +118,6 @@ impl Grid {
 }
 
 fn main() -> Result<(), std::io::Error> {
-
     let filename = "input";
 
     // Open the file in read-only mode (ignoring errors).
@@ -137,11 +140,11 @@ fn main() -> Result<(), std::io::Error> {
             0 => {
                 println!("New grid");
                 if current_grid.len() > 0 {
-                let closing_grid = current_grid;
-                current_grid = Grid::new();
-                grids.push(closing_grid);
+                    let closing_grid = current_grid;
+                    current_grid = Grid::new();
+                    grids.push(closing_grid);
                 }
-            },
+            }
             _ => {
                 current_grid.add_row(&line);
             }
@@ -167,7 +170,10 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     // Get last closed grid
-    let last_complete = grids.iter().max_by_key(|grid| grid.complete_index()).unwrap();
+    let last_complete = grids
+        .iter()
+        .max_by_key(|grid| grid.complete_index())
+        .unwrap();
     last_complete.score();
 
     Ok(())

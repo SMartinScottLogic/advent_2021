@@ -1,9 +1,9 @@
+use std::cmp::{max, min};
+use std::collections::HashMap;
 use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::str::FromStr;
-use std::cmp::{min, max};
-use std::io::{BufRead, BufReader};
-use std::collections::HashMap;
 
 pub fn load(filename: &str) -> Solution {
     let file = File::open(filename).unwrap();
@@ -17,17 +17,14 @@ pub fn load(filename: &str) -> Solution {
 }
 
 #[derive(Debug)]
-pub struct Solution {    
-}
-
+pub struct Solution {}
 
 impl Solution {
     fn new() -> Self {
         Self {}
     }
 
-    pub fn analyse(&mut self) {
-    }
+    pub fn analyse(&mut self) {}
 
     pub fn answer(&self) -> i64 {
         0
