@@ -13,7 +13,6 @@ fn main() {
 
     let reader = BufReader::new(file);
 
-    let mut last: Option<i32> = None;
     let mut count = 0;
     let mut counts = HashMap::new();
 

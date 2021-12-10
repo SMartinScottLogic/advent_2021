@@ -11,11 +11,9 @@ fn main() {
 
     let reader = BufReader::new(file);
 
-    let mut last: Option<i32> = None;
-    let mut count = 0;
     let mut position = (0, 0);
 
-    for (index, line) in reader.lines().enumerate() {
+    for line in reader.lines() {
         let line = line.unwrap();
         let mut s = line.split(" ");
         let d = (s.next().unwrap(), s.next().unwrap().parse::<i32>().unwrap());
@@ -24,20 +22,8 @@ fn main() {
             ("forward", v) => position.0 += v,
             ("down", v) => position.1 += v,
             ("up", v) => position.1 -= v,
-            (o, v) => panic!("Unexpected direction '{}'", o),
+            (o, _v) => panic!("Unexpected direction '{}'", o),
         }
-        /*
-        let reading: i32 = line.parse().unwrap();
-
-        match last {
-            Some(v) if reading > v => count += 1,
-            _ => {}
-        }
-        // Show the line and its number.
-
-        println!("{}. {}", index + 1, reading);
-        last = Some(reading);
-        */
     }
     println!("position = {:?}", position);
     println!("result: {}", position.0 * position.1);

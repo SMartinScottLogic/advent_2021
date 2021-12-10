@@ -1,9 +1,6 @@
-use std::cmp::min;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
-use std::str::FromStr;
 use utils::Matrix;
 
 use itertools::Itertools;

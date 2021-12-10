@@ -1,9 +1,5 @@
-use std::cmp::{max, min};
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
-use std::str::FromStr;
 
 pub fn load(filename: &str) -> Solution {
     let file = File::open(filename).unwrap();

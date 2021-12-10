@@ -1,10 +1,7 @@
-use std::cmp::min;
-use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::str::FromStr;
-use utils::Matrix;
 
 use itertools::Itertools;
 
@@ -55,16 +52,6 @@ impl Solution {
         }
     }
 
-    fn calculate_score(&self, c: &char) -> i64 {
-        match c {
-            ')' => 3,
-            ']' => 57,
-            '}' => 1197,
-            '>' => 25137,
-            _ => panic!(),
-        }
-    }
-
     fn counterpoint(&self, c: &char) -> char {
         match c {
             '(' => ')',
@@ -82,7 +69,6 @@ impl Solution {
             let mut opened = Vec::new();
             let mut illegal = false;
             for (pos, x) in line.data.iter().enumerate() {
-                let mut score = 0;
                 illegal = match x {
                     '(' | '[' | '{' | '<' => {
                         opened.push(x);
@@ -90,11 +76,9 @@ impl Solution {
                     }
                     _ => match opened.pop() {
                         None => {
-                            score += self.calculate_score(x);
                             true
                         }
                         Some(y) if !self.matched_pair(y, x) => {
-                            score += self.calculate_score(x);
                             true
                         }
                         _ => false,

@@ -2,8 +2,6 @@ use std::fs::File;
 
 use std::io::{BufRead, BufReader};
 
-use std::collections::HashMap;
-
 fn main() -> Result<(), std::io::Error> {
     let filename = "input";
 
@@ -15,7 +13,7 @@ fn main() -> Result<(), std::io::Error> {
 
     let mut draws = String::new();
 
-    let len = reader.read_line(&mut draws)?;
+    reader.read_line(&mut draws)?;
     let draws: Vec<_> = draws.trim().split(',').collect();
     let mut grids = Vec::new();
     let mut current_grid = Vec::new();
@@ -52,7 +50,7 @@ fn main() -> Result<(), std::io::Error> {
                 let mut new_row = Vec::new();
                 for cell in row {
                     let new_cell = match cell {
-                        (v, marked) if v == draw => (v, true),
+                        (v, _marked) if v == draw => (v, true),
                         (v, marked) => (v, marked),
                     };
                     new_row.push(new_cell);
@@ -79,9 +77,9 @@ fn main() -> Result<(), std::io::Error> {
                     grid_win = true;
                 }
             }
-            for col in (0..num_col) {
+            for col in 0..num_col {
                 let mut col_win = true;
-                for row in (0..num_row) {
+                for row in 0..num_row {
                     if grid[row][col].1 != true {
                         col_win = false;
                     }
@@ -94,7 +92,6 @@ fn main() -> Result<(), std::io::Error> {
             if grid_win {
                 let mut score = 0u64;
                 for row in grid {
-                    let mut row_win = true;
                     for cell in row {
                         if cell.1 != true {
                             println!("{:?}", cell);
