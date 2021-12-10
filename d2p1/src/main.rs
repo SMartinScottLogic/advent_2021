@@ -2,10 +2,7 @@ use std::fs::File;
 
 use std::io::{BufRead, BufReader};
 
-
-
 fn main() {
-
     let filename = "input";
 
     // Open the file in read-only mode (ignoring errors).
@@ -27,7 +24,7 @@ fn main() {
             ("forward", v) => position.0 += v,
             ("down", v) => position.1 += v,
             ("up", v) => position.1 -= v,
-            (o, v) => panic!("Unexpected direction '{}'", o)
+            (o, v) => panic!("Unexpected direction '{}'", o),
         }
         /*
         let reading: i32 = line.parse().unwrap();
@@ -41,9 +38,7 @@ fn main() {
         println!("{}. {}", index + 1, reading);
         last = Some(reading);
         */
-
     }
     println!("position = {:?}", position);
     println!("result: {}", position.0 * position.1);
-
 }

@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::cmp::max;
+use std::collections::HashMap;
 
 #[derive(Debug, Default)]
 pub struct Matrix {
@@ -10,7 +10,9 @@ pub struct Matrix {
 
 impl Matrix {
     pub fn new() -> Matrix {
-        Matrix { ..Default::default()}
+        Matrix {
+            ..Default::default()
+        }
     }
 
     pub fn get(&self, x: isize, y: isize) -> Option<&i64> {
@@ -27,7 +29,6 @@ impl Matrix {
         (self.max_x, self.max_y)
     }
 }
-
 
 #[cfg(test)]
 mod tests {

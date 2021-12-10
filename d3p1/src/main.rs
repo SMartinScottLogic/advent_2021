@@ -5,7 +5,6 @@ use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
 
 fn main() {
-
     let filename = "input";
 
     // Open the file in read-only mode (ignoring errors).
@@ -45,7 +44,6 @@ fn main() {
         println!("{}. {}", index + 1, reading);
         last = Some(reading);
         */
-
     }
     println!("Count = {} {:?}", count, counts);
 
@@ -53,13 +51,12 @@ fn main() {
     let mut gamma = 0;
     for (k, v) in counts {
         if v > (count >> 1) {
-          let value = 1 << k;
-          epsilon += value;
+            let value = 1 << k;
+            epsilon += value;
         } else {
-          let value = 1 << k;
-          gamma += value;
+            let value = 1 << k;
+            gamma += value;
         }
-
     }
     println!("total = {} x {} = {}", epsilon, gamma, epsilon * gamma);
 }

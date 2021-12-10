@@ -16,10 +16,13 @@ pub fn load(filename: &str) -> Solution {
     let mut solution = Solution::new();
     for (y, line) in reader.lines().enumerate() {
         let line = line.unwrap();
-        for (x, value) in line.trim()
-        .chars()
-        .map(|v| v.to_string())
-        .map(|v| v.parse::<i64>().unwrap()).enumerate() {
+        for (x, value) in line
+            .trim()
+            .chars()
+            .map(|v| v.to_string())
+            .map(|v| v.parse::<i64>().unwrap())
+            .enumerate()
+        {
             solution.add(x.try_into().unwrap(), y.try_into().unwrap(), value);
         }
     }
@@ -46,8 +49,7 @@ impl Solution {
     }
 
     fn get(&self, x: isize, y: isize) -> Option<i64> {
-        self.data.get(x, y)
-                .and_then(|v| Some(v.to_owned()))
+        self.data.get(x, y).and_then(|v| Some(v.to_owned()))
     }
 
     pub fn analyse(&mut self) {
@@ -100,37 +102,41 @@ impl Solution {
                 for (x, y) in &points {
                     new_points.insert((*x, *y));
                     // Up
-                    if self.get(*x, y-1).unwrap_or(9) != 9 {
-                            //println!("grow to ({}, {})", x, y - 1);
-                            new_points.insert((*x, y-1));
+                    if self.get(*x, y - 1).unwrap_or(9) != 9 {
+                        //println!("grow to ({}, {})", x, y - 1);
+                        new_points.insert((*x, y - 1));
                     }
                     // Down
                     if self.get(*x, y + 1).unwrap_or(9) != 9 {
-                            //println!("grow to ({}, {})", x, y + 1);
-                            new_points.insert((*x, y+1));
+                        //println!("grow to ({}, {})", x, y + 1);
+                        new_points.insert((*x, y + 1));
                     }
                     // Left
                     if self.get(x - 1, *y).unwrap_or(9) != 9 {
-                            //println!("grow to ({}, {})", x-1, y);
-                            new_points.insert((x-1, *y));
+                        //println!("grow to ({}, {})", x-1, y);
+                        new_points.insert((x - 1, *y));
                     }
                     // Right
                     if self.get(x + 1, *y).unwrap_or(9) != 9 {
-                            //println!("grow to ({}, {})", x+1, y);
-                            new_points.insert((x+1, *y));
-                        
+                        //println!("grow to ({}, {})", x+1, y);
+                        new_points.insert((x + 1, *y));
                     }
                 }
                 if points.len() < new_points.len() {
                     points = new_points;
-                } else  {
+                } else {
                     break;
                 }
             }
-            println!("({},{}) points {} = {:?}", x, y, points.len(),  points);
+            println!("({},{}) points {} = {:?}", x, y, points.len(), points);
             sizes.push(points.len());
         }
-        self.answer = sizes.iter().sorted().rev().take(3).fold(1, |acc, v| acc * *v as i64);
+        self.answer = sizes
+            .iter()
+            .sorted()
+            .rev()
+            .take(3)
+            .fold(1, |acc, v| acc * *v as i64);
         println!("{}", self.answer);
     }
 
@@ -138,4 +144,3 @@ impl Solution {
         self.answer as i64
     }
 }
-

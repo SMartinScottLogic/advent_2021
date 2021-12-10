@@ -2,10 +2,7 @@ use std::fs::File;
 
 use std::io::{BufRead, BufReader};
 
-
-
 fn main() {
-
     let filename = "input";
 
     // Open the file in read-only mode (ignoring errors).
@@ -29,8 +26,6 @@ fn main() {
 
         println!("{}. {}", index + 1, reading);
         last = Some(reading);
-
     }
     println!("Count = {}", count);
-
 }

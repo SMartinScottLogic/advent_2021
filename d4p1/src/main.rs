@@ -5,7 +5,6 @@ use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
 
 fn main() -> Result<(), std::io::Error> {
-
     let filename = "input";
 
     // Open the file in read-only mode (ignoring errors).
@@ -22,17 +21,21 @@ fn main() -> Result<(), std::io::Error> {
     let mut current_grid = Vec::new();
     for line in reader.lines() {
         let line = line?.to_owned();
-        let line: Vec<_> = line.split_whitespace().into_iter().map(|v| (v.to_owned(), false)).collect();
+        let line: Vec<_> = line
+            .split_whitespace()
+            .into_iter()
+            .map(|v| (v.to_owned(), false))
+            .collect();
         println!("line: {:?}", line);
         match line.len() {
             0 => {
                 println!("New grid");
                 if current_grid.len() > 0 {
-                let closing_grid = current_grid;
-                current_grid = Vec::new();
-                grids.push(closing_grid);
+                    let closing_grid = current_grid;
+                    current_grid = Vec::new();
+                    grids.push(closing_grid);
                 }
-            },
+            }
             _ => {
                 current_grid.push(line);
             }
@@ -50,7 +53,7 @@ fn main() -> Result<(), std::io::Error> {
                 for cell in row {
                     let new_cell = match cell {
                         (v, marked) if v == draw => (v, true),
-                        (v, marked) => (v, marked)
+                        (v, marked) => (v, marked),
                     };
                     new_row.push(new_cell);
                 }
@@ -90,18 +93,18 @@ fn main() -> Result<(), std::io::Error> {
             }
             if grid_win {
                 let mut score = 0u64;
-            for row in grid {
-                let mut row_win = true;
-                for cell in row {
-                    if cell.1 != true {
-                        println!("{:?}", cell);
-                        score += cell.0.parse::<u64>().unwrap();
+                for row in grid {
+                    let mut row_win = true;
+                    for cell in row {
+                        if cell.1 != true {
+                            println!("{:?}", cell);
+                            score += cell.0.parse::<u64>().unwrap();
+                        }
                     }
                 }
-            }
-            let draw_score = draw.parse::<u64>().unwrap();
-            println!("score {} x {} = {}", score, draw_score, score * draw_score);
-            panic!("done");
+                let draw_score = draw.parse::<u64>().unwrap();
+                println!("score {} x {} = {}", score, draw_score, score * draw_score);
+                panic!("done");
             }
         }
         println!("{} {:?}", draw, grids);
@@ -111,7 +114,7 @@ fn main() -> Result<(), std::io::Error> {
     /*
     let mut oxygen: Vec<String> = data.iter().map(|v| v.clone()).collect();
     let mut index = 0;
-    while oxygen.len() > 1 
+    while oxygen.len() > 1
     {
         let p = oxygen.iter().fold(HashMap::new(), |mut acc, v| {
             *acc.entry(v.as_bytes()[index] as char).or_insert(0) += 1;
@@ -129,7 +132,7 @@ fn main() -> Result<(), std::io::Error> {
     }
     let mut co2: Vec<String> = data.iter().map(|v| v.clone()).collect();
     let mut index = 0;
-    while co2.len() > 1 
+    while co2.len() > 1
     {
         let p = co2.iter().fold(HashMap::new(), |mut acc, v| {
             *acc.entry(v.as_bytes()[index] as char).or_insert(0) += 1;
