@@ -81,7 +81,7 @@ impl Solution {
         for line in &self.data {
             let mut opened = Vec::new();
             let mut illegal = false;
-            for (pos,x) in line.data.iter().enumerate() {
+            for (pos, x) in line.data.iter().enumerate() {
                 let mut score = 0;
                 illegal = match x {
                     '(' | '[' | '{' | '<' => {
@@ -122,7 +122,7 @@ impl Solution {
                             ']' => 2,
                             '}' => 3,
                             '>' => 4,
-                        _ => panic!()
+                            _ => panic!(),
                         };
                     }
                 }
@@ -131,7 +131,12 @@ impl Solution {
             autocomplete_scores.push(score);
         }
         let answer_pos = autocomplete_scores.len() / 2;
-        self.answer = *autocomplete_scores.iter().sorted().skip(answer_pos).next().unwrap();
+        self.answer = *autocomplete_scores
+            .iter()
+            .sorted()
+            .skip(answer_pos)
+            .next()
+            .unwrap();
         println!("{}", self.answer);
     }
 
