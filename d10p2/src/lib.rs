@@ -75,12 +75,8 @@ impl Solution {
                         false
                     }
                     _ => match opened.pop() {
-                        None => {
-                            true
-                        }
-                        Some(y) if !self.matched_pair(y, x) => {
-                            true
-                        }
+                        None => true,
+                        Some(y) if !self.matched_pair(y, x) => true,
                         _ => false,
                     },
                 };

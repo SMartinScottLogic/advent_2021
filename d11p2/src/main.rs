@@ -1,4 +1,4 @@
-use d11p1::load;
+use d11p2::load;
 
 fn main() {
     let mut solution = load("input.d11p1.full");
