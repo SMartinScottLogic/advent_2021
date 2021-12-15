@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use log::{debug, info};
 
 pub fn load(filename: &str) -> Solution {
     let file = File::open(filename).unwrap();

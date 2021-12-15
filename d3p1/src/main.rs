@@ -2,10 +2,13 @@ use std::fs::File;
 
 use std::io::{BufRead, BufReader};
 
+use log::{debug, info};
 use std::collections::HashMap;
 
 fn main() {
-    let filename = "input";
+    env_logger::init();
+
+    let filename = "input.d3p1.full";
 
     // Open the file in read-only mode (ignoring errors).
 
@@ -13,49 +16,38 @@ fn main() {
 
     let reader = BufReader::new(file);
 
-    let mut count = 0;
-    let mut counts = HashMap::new();
+    let (count, freq) = reader
+        .lines()
+        .map(Result::unwrap)
+        .fold((0, HashMap::new()), update_bit_counts);
 
-    for line in reader.lines() {
-        count += 1;
-        let line = line.unwrap();
-        let mut reading = u32::from_str_radix(&line, 2).unwrap();
+    let (gamma, epsilon) = calculate_rates(count, &freq);
+    info!("total = {} x {} = {}", epsilon, gamma, epsilon * gamma);
+}
 
-        println!("{} -> {}", line, reading);
-        let mut index = 0;
-        while reading > 0 {
-            let field = reading & 1;
-            println!("  {} {}", index, field);
-            *counts.entry(index).or_insert(0) += field;
-            reading >>= 1;
-            index += 1;
-        }
-
-        /*
-        let reading: i32 = line.parse().unwrap();
-
-        match last {
-            Some(v) if reading > v => count += 1,
-            _ => {}
-        }
-        // Show the line and its number.
-
-        println!("{}. {}", index + 1, reading);
-        last = Some(reading);
-        */
-    }
-    println!("Count = {} {:?}", count, counts);
-
+fn calculate_rates(count: i32, freq: &HashMap<usize, i32>) -> (i32, i32) {
     let mut epsilon = 0;
     let mut gamma = 0;
-    for (k, v) in counts {
-        if v > (count >> 1) {
-            let value = 1 << k;
-            epsilon += value;
+    for (k, reading) in freq {
+        debug!("{} {} / {}", k, reading, count);
+        let increment = 1 << k;
+        if *reading > (count >> 1) {
+            epsilon += increment;
         } else {
-            let value = 1 << k;
-            gamma += value;
+            gamma += increment;
         }
     }
-    println!("total = {} x {} = {}", epsilon, gamma, epsilon * gamma);
+    (gamma, epsilon)
+}
+
+fn update_bit_counts(
+    (count, mut acc): (i32, HashMap<usize, i32>),
+    v: String,
+) -> (i32, HashMap<usize, i32>) {
+    for (index, value) in v.chars().rev().enumerate() {
+        if value == '1' {
+            *acc.entry(index).or_insert(0) += 1;
+        }
+    }
+    (count + 1, acc)
 }
