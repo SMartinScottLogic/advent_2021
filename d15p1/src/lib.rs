@@ -46,24 +46,34 @@ impl Solution {
     fn display(&self, visited: &HashMap<(isize, isize), i64>) {
         for y in 0..=self.ysize {
             for x in 0..=self.xsize {
-                print!("{}", visited.get(&(x, y)).map(|v| v.to_string()).unwrap_or(" ".to_string()));
+                print!(
+                    "{}",
+                    visited
+                        .get(&(x, y))
+                        .map(|v| v.to_string())
+                        .unwrap_or(" ".to_string())
+                );
             }
             println!();
         }
         println!();
     }
 
-    fn next(&self, visited: &HashSet<(isize, isize)>, distance: &HashMap<(isize, isize), i64>) -> (isize, isize) {
+    fn next(
+        &self,
+        visited: &HashSet<(isize, isize)>,
+        distance: &HashMap<(isize, isize), i64>,
+    ) -> (isize, isize) {
         let mut next = (0, 0);
         let mut best_cost: i64 = -1;
         for ((x, y), cost) in distance {
             if visited.contains(&(*x, *y)) {
                 continue;
             }
-                if best_cost == -1 || *cost < best_cost {
-                    best_cost = *cost;
-                    next = (*x, *y);
-                }
+            if best_cost == -1 || *cost < best_cost {
+                best_cost = *cost;
+                next = (*x, *y);
+            }
         }
         next
     }
@@ -77,49 +87,49 @@ impl Solution {
         loop {
             let (x, y) = self.next(&visited, &distance);
 
-        let cur = *distance.entry((x, y)).or_insert(0);
-        // Up
-        if let Some(value) = self.data.get(x, y - 1) {
-            let cost = cur + value;
-            let curcost = distance.get(&(x, y - 1)).unwrap_or(&-1);
-            if *curcost == -1 || *curcost > cost {
-                *distance.entry((x, y - 1)).or_insert(0) = cost;
+            let cur = *distance.entry((x, y)).or_insert(0);
+            // Up
+            if let Some(value) = self.data.get(x, y - 1) {
+                let cost = cur + value;
+                let curcost = distance.get(&(x, y - 1)).unwrap_or(&-1);
+                if *curcost == -1 || *curcost > cost {
+                    *distance.entry((x, y - 1)).or_insert(0) = cost;
+                }
             }
-        }
-        // Down
-        if let Some(value) = self.data.get(x, y + 1) {
-            let cost = cur + value;
-            let curcost = distance.get(&(x, y + 1)).unwrap_or(&-1);
-            if *curcost == -1 || *curcost > cost {
-                *distance.entry((x, y + 1)).or_insert(0) = cost;
+            // Down
+            if let Some(value) = self.data.get(x, y + 1) {
+                let cost = cur + value;
+                let curcost = distance.get(&(x, y + 1)).unwrap_or(&-1);
+                if *curcost == -1 || *curcost > cost {
+                    *distance.entry((x, y + 1)).or_insert(0) = cost;
+                }
             }
-        }
-        // Left
-        if let Some(value) = self.data.get(x - 1, y) {
-            let cost = cur + value;
-            let curcost = distance.get(&(x - 1, y)).unwrap_or(&-1);
-            if *curcost == -1 || *curcost > cost {
-                *distance.entry((x - 1, y)).or_insert(0) = cost;
+            // Left
+            if let Some(value) = self.data.get(x - 1, y) {
+                let cost = cur + value;
+                let curcost = distance.get(&(x - 1, y)).unwrap_or(&-1);
+                if *curcost == -1 || *curcost > cost {
+                    *distance.entry((x - 1, y)).or_insert(0) = cost;
+                }
             }
-        }
-        // Right
-        if let Some(value) = self.data.get(x + 1, y) {
-            let cost = cur + value;
-            let curcost = distance.get(&(x + 1, y)).unwrap_or(&-1);
-            if *curcost == -1 || *curcost > cost {
-                *distance.entry((x + 1, y)).or_insert(0) = cost;
+            // Right
+            if let Some(value) = self.data.get(x + 1, y) {
+                let cost = cur + value;
+                let curcost = distance.get(&(x + 1, y)).unwrap_or(&-1);
+                if *curcost == -1 || *curcost > cost {
+                    *distance.entry((x + 1, y)).or_insert(0) = cost;
+                }
             }
-        }
 
-        visited.insert((x, y));
-        // self.display(&distance);
-        if x == self.xsize && y == self.xsize {
-            println!("done");
-            break;
+            visited.insert((x, y));
+            // self.display(&distance);
+            if x == self.xsize && y == self.xsize {
+                println!("done");
+                break;
+            }
+            println!("next: {:?}", self.next(&visited, &distance));
+            //break;
         }
-        println!("next: {:?}", self.next(&visited, &distance));
-        //break;
-    }
         self.answer = *distance.get(&(self.xsize, self.ysize)).unwrap_or(&-1);
     }
 

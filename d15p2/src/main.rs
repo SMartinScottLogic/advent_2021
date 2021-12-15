@@ -1,10 +1,14 @@
+use log::info;
+
 use d15p2::load;
 
 fn main() {
+    env_logger::init();
+
     //let mut solution = load("expected");
     let mut solution = load("input.d15p1.full");
 
-    println!("solution: {:?}", solution);
+    info!("solution: {:?}", solution);
     solution.analyse();
-    println!("answer is {}", solution.answer());
+    info!("answer is {}", solution.answer());
 }
