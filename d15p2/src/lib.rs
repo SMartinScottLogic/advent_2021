@@ -50,14 +50,15 @@ impl Solution {
         for y in 0..=sy {
             for x in 0..=sx {
                 let v = self.data.get(x, y).unwrap().to_owned();
-                for dy in 0..=yfactor {
-                for dx in 0..=xfactor {
+                for dy in 0..yfactor {
+                for dx in 0..xfactor {
                     let mut nv = v + dx as i64 + dy as i64;
                     while nv > 9 {
                         nv -= 9;
                     }
-                    let nx = x + (dx as isize * sx);
-                    let ny = y + (dy as isize * sy);
+                    let nx = x + (dx as isize * (1 + sx));
+                    let ny = y + (dy as isize * (1 + sy));
+                    println!("{} {} {}", nx, ny, nv);
                     self.data.set(nx, ny, nv);
                 }
                 }
@@ -72,7 +73,7 @@ impl Solution {
     fn display(&self) {
         for y in 0..=self.ysize {
             for x in 0..=self.xsize {
-                print!("{} ", self.data.get(x, y).unwrap_or(&-1));
+                print!("{}", self.data.get(x, y).unwrap_or(&-1));
             }
             println!();
         }
@@ -95,7 +96,7 @@ impl Solution {
     }
 
     pub fn analyse(&mut self) {
-        return;
+        //return;
         let mut visited = HashSet::new();
         let mut distance = HashMap::new();
         distance.entry((0, 0)).or_insert(0);
@@ -144,9 +145,11 @@ impl Solution {
             println!("done");
             break;
         }
-        println!("next: {:?}", self.next(&visited, &distance));
+        println!("next: {:?} {} / {}", self.next(&visited, &distance), visited.len(), (self.xsize + 1) * (self.ysize + 1));
         //break;
     }
+    println!("{}", self.xsize);
+    println!("{}", self.ysize);
         self.answer = *distance.get(&(self.xsize, self.ysize)).unwrap_or(&-1);
     }
 
