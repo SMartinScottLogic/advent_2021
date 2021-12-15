@@ -1,9 +1,12 @@
 use std::fs::File;
-
 use std::io::{BufRead, BufReader};
 
+use log::debug;
+use log::info;
+
 fn main() {
-    let filename = "input";
+    env_logger::init();
+    let filename = "input.d1p1.full";
 
     // Open the file in read-only mode (ignoring errors).
 
@@ -11,21 +14,20 @@ fn main() {
 
     let reader = BufReader::new(file);
 
-    let mut last: Option<i32> = None;
-    let mut count = 0;
+    let count = reader
+        .lines()
+        .filter_map(|v| v.map(|v| v.parse::<i32>().unwrap()).ok())
+        .fold(None, accumulate)
+        .map(|(_, count)| count)
+        .unwrap_or(-1);
+    info!("Count = {}", count);
+}
 
-    for (index, line) in reader.lines().enumerate() {
-        let line = line.unwrap();
-        let reading: i32 = line.parse().unwrap();
-
-        match last {
-            Some(v) if reading > v => count += 1,
-            _ => {}
-        }
-        // Show the line and its number.
-
-        println!("{}. {}", index + 1, reading);
-        last = Some(reading);
+fn accumulate(acc: Option<(i32, i32)>, reading: i32) -> Option<(i32, i32)> {
+    debug!("reading: {}", reading);
+    match acc {
+        Some((last, count)) if reading > last => Some((reading, count + 1)),
+        Some((_last, count)) => Some((reading, count)),
+        None => Some((reading, 0)),
     }
-    println!("Count = {}", count);
 }
