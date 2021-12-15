@@ -1,14 +1,19 @@
-use std::cmp::{max, min};
+use log::debug;
+use std::cmp::max;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
-use std::str::FromStr;
 
 use utils::Matrix;
 
 pub fn load(filename: &str) -> Solution {
-    let file = File::open(filename).unwrap();
+    let file = match File::open(filename) {
+        Ok(file) => file,
+        Err(e) => {
+            println!("Failed to open {} file error: {:?}", filename, e);
+            panic!();
+        }
+    };
 
     let reader = BufReader::new(file);
 
@@ -51,105 +56,108 @@ impl Solution {
             for x in 0..=sx {
                 let v = self.data.get(x, y).unwrap().to_owned();
                 for dy in 0..yfactor {
-                for dx in 0..xfactor {
-                    let mut nv = v + dx as i64 + dy as i64;
-                    while nv > 9 {
-                        nv -= 9;
+                    for dx in 0..xfactor {
+                        let mut nv = v + dx as i64 + dy as i64;
+                        while nv > 9 {
+                            nv -= 9;
+                        }
+                        let nx = x + (dx as isize * (1 + sx));
+                        let ny = y + (dy as isize * (1 + sy));
+                        debug!("{} {} {}", nx, ny, nv);
+                        self.data.set(nx, ny, nv);
                     }
-                    let nx = x + (dx as isize * (1 + sx));
-                    let ny = y + (dy as isize * (1 + sy));
-                    println!("{} {} {}", nx, ny, nv);
-                    self.data.set(nx, ny, nv);
-                }
                 }
             }
         }
-        println!("({}, {})", self.xsize, self.xsize);
+        debug!("({}, {})", self.xsize, self.xsize);
         self.xsize = ((self.xsize + 1) * xfactor as isize) - 1;
         self.ysize = ((self.ysize + 1) * yfactor as isize) - 1;
-        println!("({}, {})", self.xsize, self.ysize);
+        debug!("({}, {})", self.xsize, self.ysize);
     }
 
     fn display(&self) {
         for y in 0..=self.ysize {
+            let mut row = "".to_string();
             for x in 0..=self.xsize {
-                print!("{}", self.data.get(x, y).unwrap_or(&-1));
+                row.push_str(&format!("{}", self.data.get(x, y).unwrap_or(&-1)));
             }
-            println!();
+            debug!("{}", row);
         }
-        println!();
     }
 
-    fn next(&self, visited: &HashSet<(isize, isize)>, distance: &HashMap<(isize, isize), i64>) -> (isize, isize) {
+    fn next(&self, notvisited: &HashMap<(isize, isize), i64>) -> (isize, isize) {
         let mut next = (0, 0);
         let mut best_cost: i64 = -1;
-        for ((x, y), cost) in distance {
-            if visited.contains(&(*x, *y)) {
-                continue;
+        for ((x, y), cost) in notvisited {
+            let cost = cost.to_owned();
+            if best_cost == -1 || (cost != -1 && cost < best_cost) {
+                best_cost = cost;
+                next = (*x, *y);
             }
-                if best_cost == -1 || *cost < best_cost {
-                    best_cost = *cost;
-                    next = (*x, *y);
-                }
+        }
+        if best_cost < 0 {
+            panic!();
         }
         next
     }
 
     pub fn analyse(&mut self) {
         //return;
-        let mut visited = HashSet::new();
+        let mut notvisited = HashSet::new();
+        {
+            let (xsize, ysize) = self.data.dimensions();
+            for y in 0..=ysize {
+                for x in 0..=xsize {
+                    notvisited.insert((x, y));
+                }
+            }
+        }
         let mut distance = HashMap::new();
+        let mut notvisited_scored = HashMap::new();
+
         distance.entry((0, 0)).or_insert(0);
+        notvisited_scored.entry((0, 0)).or_insert(0);
         // loop here ?
 
         loop {
-            let (x, y) = self.next(&visited, &distance);
+            let (x, y) = self.next(&notvisited_scored);
 
-        let cur = *distance.entry((x, y)).or_insert(0);
-        // Up
-        if let Some(value) = self.data.get(x, y - 1) {
-            let cost = cur + value;
-            let curcost = distance.get(&(x, y - 1)).unwrap_or(&-1);
-            if *curcost == -1 || *curcost > cost {
-                *distance.entry((x, y - 1)).or_insert(0) = cost;
+            let cur = *distance.entry((x, y)).or_insert(0);
+            for sy in -1isize..=1 {
+                for sx in -1isize..=1 {
+                    if isize::abs(sx) == isize::abs(sy) {
+                        continue;
+                    }
+                    if let Some(value) = self.data.get(x + sx, y + sy) {
+                        let cost = cur + value;
+                        if notvisited.contains(&(x + sx, y + sy)) {
+                            let s = notvisited_scored.entry((x + sx, y + sy)).or_insert(-1);
+                            if *s == -1 || *s > cost {
+                                *s = cost;
+                                *distance.entry((x + sx, y + sy)).or_insert(0) = cost;
+                            }
+                        }
+                    }
+                }
             }
-        }
-        // Down
-        if let Some(value) = self.data.get(x, y + 1) {
-            let cost = cur + value;
-            let curcost = distance.get(&(x, y + 1)).unwrap_or(&-1);
-            if *curcost == -1 || *curcost > cost {
-                *distance.entry((x, y + 1)).or_insert(0) = cost;
-            }
-        }
-        // Left
-        if let Some(value) = self.data.get(x - 1, y) {
-            let cost = cur + value;
-            let curcost = distance.get(&(x - 1, y)).unwrap_or(&-1);
-            if *curcost == -1 || *curcost > cost {
-                *distance.entry((x - 1, y)).or_insert(0) = cost;
-            }
-        }
-        // Right
-        if let Some(value) = self.data.get(x + 1, y) {
-            let cost = cur + value;
-            let curcost = distance.get(&(x + 1, y)).unwrap_or(&-1);
-            if *curcost == -1 || *curcost > cost {
-                *distance.entry((x + 1, y)).or_insert(0) = cost;
-            }
-        }
 
-        visited.insert((x, y));
-        // self.display(&distance);
-        if x == self.xsize && y == self.xsize {
-            println!("done");
-            break;
+            notvisited.remove(&(x, y));
+            notvisited_scored.remove(&(x, y));
+            // self.display(&distance);
+            if x == self.xsize && y == self.xsize {
+                // Done
+                break;
+            }
+            debug!(
+                "next: {:?} {} / {}",
+                self.next(&notvisited_scored),
+                notvisited.len(),
+                (self.xsize + 1) * (self.ysize + 1)
+            );
+            //break;
         }
-        println!("next: {:?} {} / {}", self.next(&visited, &distance), visited.len(), (self.xsize + 1) * (self.ysize + 1));
-        //break;
-    }
-    println!("{}", self.xsize);
-    println!("{}", self.ysize);
+        debug!("{}", self.xsize);
+        debug!("{}", self.ysize);
         self.answer = *distance.get(&(self.xsize, self.ysize)).unwrap_or(&-1);
     }
 

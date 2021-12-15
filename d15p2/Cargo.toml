@@ -8,3 +8,7 @@ edition = "2021"
 [dependencies]
 itertools = "0.10.3"         # Extra iterator adaptors, iterator methods, free functions, and macros.
 utils = {path = "../utils"}
+# A lightweight logging facade for Rust 
+log = "0.4.14"
+# A logging implementation for `log` which is configured via an environment variable. 
+env_logger = "0.9.0"
