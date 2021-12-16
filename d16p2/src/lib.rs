@@ -1,8 +1,35 @@
 use log::debug;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::str::FromStr;
+
+#[macro_use]
+extern crate maplit;
+#[macro_use]
+extern crate lazy_static;
+
+lazy_static! {
+    static ref HEXVALUES: HashMap<char, &'static str> = hashmap! {
+        '0' => "0000",
+        '1' => "0001",
+        '2' => "0010",
+        '3' => "0011",
+        '4' => "0100",
+        '5' => "0101",
+        '6' => "0110",
+        '7' => "0111",
+        '8' => "1000",
+        '9' => "1001",
+        'A' => "1010",
+        'B' => "1011",
+        'C' => "1100",
+        'D' => "1101",
+        'E' => "1110",
+        'F' => "1111"
+    };
+}
 
 pub fn load(filename: &str) -> Solution {
     let file = File::open(filename).unwrap();
@@ -32,7 +59,7 @@ enum PacketInner {
 
 #[derive(Debug)]
 struct Packet {
-    version: i64,
+    _version: i64,
     packet_inner: PacketInner,
 }
 
@@ -48,7 +75,7 @@ impl FromStr for Packet {
 impl Packet {
     fn empty() -> Packet {
         Packet {
-            version: 0,
+            _version: 0,
             packet_inner: PacketInner::None,
         }
     }
@@ -104,28 +131,7 @@ impl Packet {
     fn hex_to_bin(input: &str) -> String {
         input
             .chars()
-            .flat_map(|c| {
-                match c {
-                    '0' => "0000",
-                    '1' => "0001",
-                    '2' => "0010",
-                    '3' => "0011",
-                    '4' => "0100",
-                    '5' => "0101",
-                    '6' => "0110",
-                    '7' => "0111",
-                    '8' => "1000",
-                    '9' => "1001",
-                    'A' => "1010",
-                    'B' => "1011",
-                    'C' => "1100",
-                    'D' => "1101",
-                    'E' => "1110",
-                    'F' => "1111",
-                    _ => unreachable!(),
-                }
-                .chars()
-            })
+            .flat_map(|c| HEXVALUES.get(&c).map(|s| *s).unwrap_or("").chars())
             .collect()
     }
 
@@ -184,7 +190,7 @@ impl Packet {
                     Self::child_packets(&bits[consumed..]);
                 consumed += child_packets_consumed;
                 Packet {
-                    version,
+                    _version: version,
                     packet_inner: Sum(child_packets),
                 }
             }
@@ -193,7 +199,7 @@ impl Packet {
                     Self::child_packets(&bits[consumed..]);
                 consumed += child_packets_consumed;
                 Packet {
-                    version,
+                    _version: version,
                     packet_inner: Product(child_packets),
                 }
             }
@@ -202,7 +208,7 @@ impl Packet {
                     Self::child_packets(&bits[consumed..]);
                 consumed += child_packets_consumed;
                 Packet {
-                    version,
+                    _version: version,
                     packet_inner: Min(child_packets),
                 }
             }
@@ -211,7 +217,7 @@ impl Packet {
                     Self::child_packets(&bits[consumed..]);
                 consumed += child_packets_consumed;
                 Packet {
-                    version,
+                    _version: version,
                     packet_inner: Max(child_packets),
                 }
             }
@@ -231,7 +237,7 @@ impl Packet {
                 let value = i64::from_str_radix(&value, 2).unwrap();
                 debug!("literal value: {}", value);
                 Packet {
-                    version,
+                    _version: version,
                     packet_inner: PacketInner::Literal(value),
                 }
             }
@@ -240,7 +246,7 @@ impl Packet {
                     Self::child_packets(&bits[consumed..]);
                 consumed += child_packets_consumed;
                 Packet {
-                    version,
+                    _version: version,
                     packet_inner: GreaterThan(child_packets),
                 }
             }
@@ -249,7 +255,7 @@ impl Packet {
                     Self::child_packets(&bits[consumed..]);
                 consumed += child_packets_consumed;
                 Packet {
-                    version,
+                    _version: version,
                     packet_inner: LessThan(child_packets),
                 }
             }
@@ -258,7 +264,7 @@ impl Packet {
                     Self::child_packets(&bits[consumed..]);
                 consumed += child_packets_consumed;
                 Packet {
-                    version,
+                    _version: version,
                     packet_inner: Equals(child_packets),
                 }
             }

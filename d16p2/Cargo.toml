@@ -12,3 +12,7 @@ log = "0.4.14"
 env_logger = "0.9.0"
 # __attribute__((constructor)) for Rust
 ctor = "0.1.21"
+# Collection “literal” macros for HashMap, HashSet, BTreeMap, and BTreeSet.
+maplit = "1.0.2"
+# A macro for declaring lazily evaluated statics in Rust.
+lazy_static = "1.4.0"
