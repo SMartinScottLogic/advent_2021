@@ -1,16 +1,17 @@
 use log::{debug, info};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use anyhow::Result;
 
-pub fn load(filename: &str) -> Solution {
-    let file = File::open(filename).unwrap();
+pub fn load(filename: &str) -> anyhow::Result<Solution> {
+    let file = File::open(filename)?;
 
     let mut reader = BufReader::new(file);
 
     let mut line = String::new();
-    reader.read_line(&mut line).unwrap();
+    reader.read_line(&mut line)?;
 
-    Solution::new()
+    Ok(Solution::new())
 }
 
 #[derive(Debug)]
@@ -23,7 +24,7 @@ impl Solution {
 
     pub fn analyse(&mut self) {}
 
-    pub fn answer(&self) -> i64 {
-        0
+    pub fn answer(&self) -> Result<i64> {
+        Ok(0)
     }
 }

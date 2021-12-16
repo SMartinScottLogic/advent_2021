@@ -1,10 +1,13 @@
 use template::load;
+use anyhow::Result;
 
-fn main() {
+fn main() -> Result<()> {
     env_logger::init();
 
-    let mut solution = load("input.full");
+    let mut solution = load("input.full")?;
     println!("solution: {:?}", solution);
     solution.analyse();
-    println!("answer is {}", solution.answer());
+    println!("answer is {}", solution.answer()?);
+
+    Ok(())
 }
