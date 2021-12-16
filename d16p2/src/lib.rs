@@ -1,10 +1,6 @@
-use core::num;
-use log::{debug, info};
-use std::collections::{HashMap, HashSet};
+use log::debug;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
-use std::str::FromStr;
 
 pub fn load(filename: &str) -> Solution {
     let file = File::open(filename).unwrap();
@@ -67,7 +63,7 @@ impl Solution {
     fn total_version(&self, bits: &str) -> (i64, usize) {
         debug!("bits {}", bits);
         let mut consumed = 0;
-        let mut total_version = i64::from_str_radix(&bits[consumed..consumed + 3], 2).unwrap();
+        let _version = i64::from_str_radix(&bits[consumed..consumed + 3], 2).unwrap();
         consumed += 3;
         let packet_type = i32::from_str_radix(&bits[consumed..consumed + 3], 2).unwrap();
         consumed += 3;

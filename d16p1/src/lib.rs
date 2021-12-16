@@ -1,10 +1,6 @@
-use core::num;
-use log::{debug, info};
-use std::collections::{HashMap, HashSet};
+use log::debug;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
-use std::str::FromStr;
 
 pub fn load(filename: &str) -> Solution {
     let file = File::open(filename).unwrap();
