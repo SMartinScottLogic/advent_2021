@@ -303,7 +303,6 @@ impl Solution {
 }
 
 #[cfg(test)]
-#[cfg(test)]
 mod tests {
     use crate::Solution;
 

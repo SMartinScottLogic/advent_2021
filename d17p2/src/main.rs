@@ -1,10 +1,10 @@
 use anyhow::Result;
-use template::load;
+use d17p2::load;
 
 fn main() -> Result<()> {
     env_logger::init();
 
-    let mut solution = load("input.full")?;
+    let mut solution = load("input.d17p1.full")?;
     println!("solution: {:?}", solution);
     solution.analyse();
     println!("answer is {}", solution.answer()?);
