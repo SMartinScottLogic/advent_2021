@@ -2,7 +2,6 @@ use anyhow::Result;
 use log::{debug, info};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use anyhow::Result;
 
 pub fn load(filename: &str) -> anyhow::Result<Solution> {
     let file = File::open(filename)?;
