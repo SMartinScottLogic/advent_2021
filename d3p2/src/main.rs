@@ -3,7 +3,6 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 use log::{debug, info};
-use std::collections::HashMap;
 
 fn main() {
     env_logger::init();
