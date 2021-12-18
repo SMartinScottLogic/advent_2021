@@ -1,12 +1,10 @@
 use anyhow::{Context, Result};
-use log::{debug, info, trace};
+use log::{debug, trace};
 use regex::Regex;
-use std::cmp::{max, min};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::num::ParseIntError;
 use std::ops::Add;
-use std::ops::AddAssign;
 use std::str::FromStr;
 
 pub fn load(filename: &str) -> anyhow::Result<Solution> {
@@ -300,7 +298,7 @@ impl FromStr for SnailfishNumber {
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use std::{error::Error, str::FromStr};
+    use std::str::FromStr;
 
     #[ctor::ctor]
     fn init() {
