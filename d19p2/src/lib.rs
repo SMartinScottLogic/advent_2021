@@ -59,8 +59,8 @@ impl Solution {
             let mut changed = false;
             let mut next_data = Vec::new();
             while let Some(mut a) = self.data.pop() {
-            //while self.data.len() > 0 {
-            //    let mut a = self.data.swap_remove(0);
+                //while self.data.len() > 0 {
+                //    let mut a = self.data.swap_remove(0);
                 let mut inner_next_data = Vec::new();
                 for b in &self.data {
                     let mut new_b = self.calculate_overlap(&a, b);
@@ -73,19 +73,13 @@ impl Solution {
 
                         debug!("{} had known scanners @ {:?}", new_b.name, new_b.scanners);
                         for beacon in new_b.scanners {
-                            a.scanners.push((
-                                beacon.0,
-                                beacon.1,
-                            ))
+                            a.scanners.push((beacon.0, beacon.1))
                         }
                         debug!(
                             "{} @ {:?} relative to {}",
                             new_b.name, new_b.position, a.name
                         );
-                        a.scanners.push((
-                            new_b.position,
-                            new_b.name,
-                        ));
+                        a.scanners.push((new_b.position, new_b.name));
 
                         debug!("{} len {}", a.name, a.data.len());
                     } else {
@@ -121,8 +115,9 @@ impl Solution {
             let distance = lhs.0.x.abs() + lhs.0.y.abs() + lhs.0.z.abs();
             max_distance = max(max_distance, distance);
             for rhs in &a.scanners {
-                let distance =
-                    (lhs.0.x - rhs.0.x).abs() + (lhs.0.y - rhs.0.y).abs() + (lhs.0.z - rhs.0.z).abs();
+                let distance = (lhs.0.x - rhs.0.x).abs()
+                    + (lhs.0.y - rhs.0.y).abs()
+                    + (lhs.0.z - rhs.0.z).abs();
                 max_distance = max(max_distance, distance);
             }
         }

@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use log::{debug};
+use log::debug;
 use regex::Regex;
 use std::cmp::{max, min};
 use std::fs::File;
@@ -29,10 +29,9 @@ pub struct Solution {
 }
 
 impl Solution {
-
     pub fn analyse(&mut self) {
         let mut max_height = 0;
-        for vy in 0..=(10*min(self.sy,self.ey).abs()) {
+        for vy in 0..=(10 * min(self.sy, self.ey).abs()) {
             for vx in -100..=max(self.sx, self.ex) {
                 match self.simulate(vx, vy) {
                     true => {
