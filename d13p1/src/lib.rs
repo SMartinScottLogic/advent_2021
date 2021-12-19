@@ -115,7 +115,7 @@ impl FromStr for Line {
         if s.starts_with("fold along") {
             println!("fold");
             let fold = s.to_owned().replace("fold along ", "");
-            let mut fold = fold.split("=");
+            let mut fold = fold.split('=');
             let dirn = fold.next().unwrap();
             let posn = fold.next().unwrap().parse::<isize>()?;
             match dirn {
@@ -123,7 +123,7 @@ impl FromStr for Line {
                 "y" => Ok(Self::Fold(Direction::Y, posn)),
                 _ => dirn.parse::<i32>().map(|_v| Self::None),
             }
-        } else if s.trim().len() == 0 {
+        } else if s.trim().is_empty() {
             println!("none");
             Ok(Self::None)
         } else {

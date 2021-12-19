@@ -61,7 +61,7 @@ impl Solution {
         let mut y = 0;
         self.answer = 0;
 
-        let hit = loop {
+        loop {
             x += vx;
             y += vy;
             self.answer = max(self.answer, y);
@@ -78,9 +78,7 @@ impl Solution {
             if y < min(self.sy, self.ey) {
                 break false;
             }
-        };
-
-        hit
+        }
     }
 }
 
@@ -94,11 +92,8 @@ impl FromStr for Solution {
         .unwrap();
         debug!("input: {}", s);
         let caps = re.captures(s.trim()).unwrap();
-        for name in re.capture_names() {
-            match name {
-                Some(n) => debug!("{} => {:?}", n, caps.name(n).map(|v| v.as_str())),
-                None => {}
-            };
+        for n in re.capture_names().flatten() {
+            debug!("{} => {:?}", n, caps.name(n).map(|v| v.as_str()))
         }
         let sx = caps.name("sx").unwrap().as_str().parse::<i64>().unwrap();
         let sy = caps.name("sy").unwrap().as_str().parse::<i64>().unwrap();

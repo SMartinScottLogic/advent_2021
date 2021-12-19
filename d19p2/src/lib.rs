@@ -21,7 +21,7 @@ pub fn load(filename: &str) -> anyhow::Result<Solution> {
     for line in reader.lines() {
         let line = line?;
         let line = line.trim();
-        if line.len() == 0 {
+        if line.is_empty() {
             continue;
         }
         if line.starts_with("--- ") {
@@ -30,7 +30,7 @@ pub fn load(filename: &str) -> anyhow::Result<Solution> {
             }
             scanner = Some(Scanner::empty(line.to_string()));
         } else {
-            scanner = scanner.map(|s| s + Point::from_str(&line).unwrap());
+            scanner = scanner.map(|s| s + Point::from_str(line).unwrap());
         }
     }
     if let Some(scanner) = scanner {
@@ -141,7 +141,7 @@ impl Solution {
                         let dy = av.y - rv.y;
                         let dz = av.z - rv.z;
                         let mut tb = r.translate(dx, dy, dz);
-                        let num_overlaps = tb.overlap(&a);
+                        let num_overlaps = tb.overlap(a);
                         if num_overlaps >= 12 {
                             debug!(
                                 "{} overlaps {}: {} (posn: {}, {}, {})",
@@ -228,7 +228,7 @@ impl Scanner {
     fn reorientate(&self, facing: &Facing, rotation: usize) -> Self {
         let mut other = self.data.iter().fold(
             Scanner::new(self.name.clone(), self.position.clone(), Vec::new()),
-            |reorientated, line| reorientated + line.reorientate(&facing, rotation),
+            |reorientated, line| reorientated + line.reorientate(facing, rotation),
         );
         other.scanners = self
             .scanners

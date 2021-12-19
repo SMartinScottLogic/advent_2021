@@ -46,7 +46,7 @@ impl Solution {
     }
 
     fn get(&self, x: isize, y: isize) -> Option<i64> {
-        self.data.get(x, y).and_then(|v| Some(v.to_owned()))
+        self.data.get(x, y).map(|v| v.to_owned())
     }
 
     pub fn analyse(&mut self) {

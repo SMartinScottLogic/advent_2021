@@ -28,7 +28,7 @@ fn main() -> Result<(), std::io::Error> {
         match line.len() {
             0 => {
                 println!("New grid");
-                if current_grid.len() > 0 {
+                if !current_grid.is_empty() {
                     let closing_grid = current_grid;
                     current_grid = Vec::new();
                     grids.push(closing_grid);
@@ -62,13 +62,12 @@ fn main() -> Result<(), std::io::Error> {
         grids = new_grids;
         for grid in &grids {
             let mut grid_win = false;
-            let num_row = grid.len();
             let mut num_col = 0;
             for row in grid {
                 let mut row_win = true;
                 num_col = row.len();
                 for cell in row {
-                    if cell.1 != true {
+                    if !cell.1 {
                         row_win = false;
                     }
                 }
@@ -79,8 +78,8 @@ fn main() -> Result<(), std::io::Error> {
             }
             for col in 0..num_col {
                 let mut col_win = true;
-                for row in 0..num_row {
-                    if grid[row][col].1 != true {
+                for item in grid {
+                    if !item[col].1 {
                         col_win = false;
                     }
                 }
@@ -93,7 +92,7 @@ fn main() -> Result<(), std::io::Error> {
                 let mut score = 0u64;
                 for row in grid {
                     for cell in row {
-                        if cell.1 != true {
+                        if !cell.1 {
                             println!("{:?}", cell);
                             score += cell.0.parse::<u64>().unwrap();
                         }

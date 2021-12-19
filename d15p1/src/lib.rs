@@ -1,9 +1,7 @@
-use std::cmp::{max, min};
+use std::cmp::max;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::num::ParseIntError;
-use std::str::FromStr;
 
 use utils::Matrix;
 
@@ -41,22 +39,6 @@ impl Solution {
         self.data.set(x as isize, y as isize, value);
         self.xsize = max(x.try_into().unwrap(), self.xsize);
         self.ysize = max(y.try_into().unwrap(), self.ysize);
-    }
-
-    fn display(&self, visited: &HashMap<(isize, isize), i64>) {
-        for y in 0..=self.ysize {
-            for x in 0..=self.xsize {
-                print!(
-                    "{}",
-                    visited
-                        .get(&(x, y))
-                        .map(|v| v.to_string())
-                        .unwrap_or(" ".to_string())
-                );
-            }
-            println!();
-        }
-        println!();
     }
 
     fn next(

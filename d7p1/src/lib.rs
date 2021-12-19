@@ -42,7 +42,7 @@ impl Solution {
     pub fn analyse(&mut self) {
         let mut best = -1i64;
         let mut best_target = 0;
-        for (target_position, _count) in &self.population {
+        for target_position in self.population.keys() {
             let mut total = 0i64;
             for (position, count) in &self.population {
                 total += (position - target_position).abs() * count;

@@ -131,7 +131,7 @@ impl Packet {
     fn hex_to_bin(input: &str) -> String {
         input
             .chars()
-            .flat_map(|c| HEXVALUES.get(&c).map(|s| *s).unwrap_or("").chars())
+            .flat_map(|c| HEXVALUES.get(&c).copied().unwrap_or("").chars())
             .collect()
     }
 

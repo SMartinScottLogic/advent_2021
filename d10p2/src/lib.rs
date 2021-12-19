@@ -43,13 +43,7 @@ impl Solution {
     }
 
     fn matched_pair(&self, a: &char, b: &char) -> bool {
-        match (a, b) {
-            ('(', ')') => true,
-            ('[', ']') => true,
-            ('{', '}') => true,
-            ('<', '>') => true,
-            _ => false,
-        }
+        matches!((a, b), ('(', ')') | ('[', ']') | ('{', '}') | ('<', '>'))
     }
 
     fn counterpoint(&self, c: &char) -> char {
@@ -111,12 +105,7 @@ impl Solution {
             autocomplete_scores.push(score);
         }
         let answer_pos = autocomplete_scores.len() / 2;
-        self.answer = *autocomplete_scores
-            .iter()
-            .sorted()
-            .skip(answer_pos)
-            .next()
-            .unwrap();
+        self.answer = *autocomplete_scores.iter().sorted().nth(answer_pos).unwrap();
         println!("{}", self.answer);
     }
 

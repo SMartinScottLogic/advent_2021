@@ -62,23 +62,21 @@ impl Solution {
         for _i in 1..=40 {
             template = template
                 .into_iter()
-                .map(
-                    |(k, v)| match self.rules.iter().filter(|(s, _t)| *s == k).next() {
-                        Some((s, t)) => {
-                            let mut next = String::new();
-                            let mut s = s.chars();
-                            next.push(s.next().unwrap());
-                            next.push_str(t);
-                            next.push(s.next().unwrap());
-                            Solution::pairs(&next, v)
-                        }
-                        _ => {
-                            let mut next = HashMap::new();
-                            next.insert(k, v);
-                            next
-                        }
-                    },
-                )
+                .map(|(k, v)| match self.rules.iter().find(|(s, _t)| *s == k) {
+                    Some((s, t)) => {
+                        let mut next = String::new();
+                        let mut s = s.chars();
+                        next.push(s.next().unwrap());
+                        next.push_str(t);
+                        next.push(s.next().unwrap());
+                        Solution::pairs(&next, v)
+                    }
+                    _ => {
+                        let mut next = HashMap::new();
+                        next.insert(k, v);
+                        next
+                    }
+                })
                 .fold(HashMap::new(), |mut acc, m| {
                     for (k, v) in m {
                         *acc.entry(k).or_insert(0i64) += v;
@@ -135,7 +133,7 @@ impl FromStr for Line {
             let source = rule.next().unwrap().to_string();
             let target = rule.next().unwrap().to_string();
             Ok(Self::Rule(source, target))
-        } else if s.trim().len() == 0 {
+        } else if s.trim().is_empty() {
             Ok(Self::None)
         } else {
             let template = s.trim().to_string();

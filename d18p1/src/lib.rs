@@ -52,7 +52,7 @@ impl Add<SnailfishNumber> for Solution {
             self.data
                 .as_ref()
                 .map(|v| v.to_string())
-                .unwrap_or("[]".to_string()),
+                .unwrap_or_else(|| "[]".to_string()),
             other.to_string()
         );
         let sum = match self.data {

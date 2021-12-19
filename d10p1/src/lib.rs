@@ -41,13 +41,7 @@ impl Solution {
     }
 
     fn matched_pair(&self, a: &char, b: &char) -> bool {
-        match (a, b) {
-            ('(', ')') => true,
-            ('[', ']') => true,
-            ('{', '}') => true,
-            ('<', '>') => true,
-            _ => false,
-        }
+        matches!((a, b), ('(', ')') | ('[', ']') | ('{', '}') | ('<', '>'))
     }
 
     fn calculate_score(&self, c: &char) -> i64 {
