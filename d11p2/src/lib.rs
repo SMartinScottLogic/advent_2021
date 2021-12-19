@@ -44,7 +44,7 @@ impl Solution {
     }
 
     fn get(&self, x: isize, y: isize) -> Option<i64> {
-        self.data.get(x, y).and_then(|v| Some(v.to_owned()))
+        self.data.get(x, y).map(|v| v.to_owned())
     }
 
     fn flash(&mut self) {
@@ -57,19 +57,15 @@ impl Solution {
             for y in 0..=ysize {
                 for x in 0..=xsize {
                     if let Some(score) = self.data.get(x, y) {
-                        if *score > 9 {
-                            if !flashed.contains(&(x, y)) {
-                                changed = true;
-                                flashed.insert((x, y));
-                                for ystep in -1..=1 {
-                                    for xstep in -1..=1 {
-                                        match self
-                                            .get(x + xstep, y + ystep)
-                                            .and_then(|v| Some(v + 1))
-                                        {
-                                            Some(value) => self.add(x + xstep, y + ystep, value),
-                                            _ => {}
-                                        }
+                        if *score > 9 && !flashed.contains(&(x, y)) {
+                            changed = true;
+                            flashed.insert((x, y));
+                            for ystep in -1..=1 {
+                                for xstep in -1..=1 {
+                                    if let Some(value) =
+                                        self.get(x + xstep, y + ystep).map(|v| v + 1)
+                                    {
+                                        self.add(x + xstep, y + ystep, value)
                                     }
                                 }
                             }

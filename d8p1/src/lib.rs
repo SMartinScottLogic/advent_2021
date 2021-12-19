@@ -13,9 +13,9 @@ pub fn load(filename: &str) -> Solution {
     for line in reader.lines() {
         let l = line
             .unwrap()
-            .split("|")
+            .split('|')
             .take(2)
-            .map(|v| Line::from_str(v).unwrap().to_owned())
+            .map(|v| Line::from_str(v).unwrap())
             .collect::<Vec<_>>();
 
         println!("{:?} => {:?}", l[0], l[1]);
@@ -50,7 +50,7 @@ impl Solution {
 
     pub fn analyse(&mut self) {
         self.answer = 0;
-        for (_input, output) in &self.data {
+        for output in self.data.values() {
             for single in output.entry() {
                 self.answer += match single.len() {
                     2 => 1, // 1 only digit with 2 segments

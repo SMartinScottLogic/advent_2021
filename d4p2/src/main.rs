@@ -38,7 +38,7 @@ impl Grid {
         new_grid
     }
 
-    fn add_row(&mut self, row: &Vec<&str>) {
+    fn add_row(&mut self, row: &[&str]) {
         let row: Vec<(String, bool)> = row.iter().map(|v| (v.to_string(), false)).collect();
         self.num_row = self.data.len();
         self.num_col = row.len();
@@ -63,7 +63,7 @@ impl Grid {
         for row in 0..new_grid.num_row {
             let mut row_win = true;
             for col in 0..new_grid.num_col {
-                if new_grid.data[row][col].1 != true {
+                if !new_grid.data[row][col].1 {
                     row_win = false;
                 }
             }
@@ -76,7 +76,7 @@ impl Grid {
         for col in 0..new_grid.num_col {
             let mut col_win = true;
             for row in 0..new_grid.num_row {
-                if new_grid.data[row][col].1 != true {
+                if !new_grid.data[row][col].1 {
                     col_win = false;
                 }
             }
@@ -105,7 +105,7 @@ impl Grid {
         let mut score = 0u64;
         for row in &self.data {
             for cell in row {
-                if cell.1 != true {
+                if !cell.1 {
                     println!("{:?}", cell);
                     score += cell.0.parse::<u64>().unwrap();
                 }

@@ -75,7 +75,7 @@ impl Solution {
 
     pub fn answer(&self) -> i64 {
         let mut total = 0;
-        for (_pos, score) in &self.scores {
+        for score in self.scores.values() {
             if *score > 1 {
                 total += 1;
             }

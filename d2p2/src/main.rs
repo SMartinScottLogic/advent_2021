@@ -47,7 +47,7 @@ impl FromStr for Instruction {
     type Err = ParseIntError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let s = s.trim().split(" ").take(2).collect::<Vec<_>>();
+        let s = s.trim().split(' ').take(2).collect::<Vec<_>>();
         let s = match &s[0..=1] {
             ["forward", v] => Self::Forward(v.parse().unwrap()),
             ["down", v] => Self::Down(v.parse().unwrap()),

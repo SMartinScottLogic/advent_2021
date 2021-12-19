@@ -49,7 +49,7 @@ impl Solution {
         let mut answer = 0;
         has_visited.insert(current_node.clone());
         path.push(current_node.clone());
-        if current_node == "end".to_string() {
+        if current_node == *"end" {
             answer += 1;
             println!("{} {:?}", current_node, path);
         } else {
@@ -58,11 +58,7 @@ impl Solution {
                 if *next_node == current {
                     continue;
                 }
-                let edges = self
-                    .edges
-                    .get(&current)
-                    .map(|e| e.clone())
-                    .unwrap_or_default();
+                let edges = self.edges.get(&current).cloned().unwrap_or_default();
                 if !edges.contains(next_node) {
                     continue;
                 }

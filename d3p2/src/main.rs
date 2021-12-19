@@ -27,7 +27,7 @@ fn main() {
     info!("{} x {} = {}", oxygen, co2, oxygen * co2);
 }
 
-fn calculate_rating(data: &Vec<String>, rule: impl Fn(usize, usize) -> bool) -> i64 {
+fn calculate_rating(data: &[String], rule: impl Fn(usize, usize) -> bool) -> i64 {
     let mut needle = "".to_string();
     let mut last_match = data.len();
     loop {

@@ -50,7 +50,7 @@ impl Solution {
         let mut answer = 0;
         has_visited.insert(current_node.clone());
         path.push(current_node.clone());
-        if current_node == "end".to_string() {
+        if current_node == *"end" {
             answer += 1;
             println!("{} {:?}", current_node, path);
         } else {
@@ -59,11 +59,7 @@ impl Solution {
                 if *next_node == current {
                     continue;
                 }
-                let edges = self
-                    .edges
-                    .get(&current)
-                    .map(|e| e.clone())
-                    .unwrap_or_default();
+                let edges = self.edges.get(&current).cloned().unwrap_or_default();
                 if !edges.contains(next_node) {
                     continue;
                 }
@@ -73,9 +69,7 @@ impl Solution {
                 let mut extra = extra_visit.clone();
                 let mut should_visit = false;
 
-                if next_node.contains(char::is_uppercase) {
-                    should_visit = true;
-                } else if !has_visited.contains(next_node) {
+                if next_node.contains(char::is_uppercase) || !has_visited.contains(next_node) {
                     should_visit = true;
                 } else if extra_visit.is_empty() && next_node != "start" && next_node != "end" {
                     should_visit = true;

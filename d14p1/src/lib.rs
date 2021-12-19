@@ -50,7 +50,7 @@ impl Solution {
                     let key = &template[p..p + 2];
                     if key == s {
                         next.push(key.chars().next().unwrap());
-                        next.push_str(&t);
+                        next.push_str(t);
                     }
                 }
             }
@@ -96,7 +96,7 @@ impl FromStr for Line {
             let source = rule.next().unwrap().to_string();
             let target = rule.next().unwrap().to_string();
             Ok(Self::Rule(source, target))
-        } else if s.trim().len() == 0 {
+        } else if s.trim().is_empty() {
             Ok(Self::None)
         } else {
             let template = s.trim().to_string();

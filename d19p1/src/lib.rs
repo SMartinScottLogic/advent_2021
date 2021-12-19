@@ -20,7 +20,7 @@ pub fn load(filename: &str) -> anyhow::Result<Solution> {
     for line in reader.lines() {
         let line = line?;
         let line = line.trim();
-        if line.len() == 0 {
+        if line.is_empty() {
             continue;
         }
         if line.starts_with("--- ") {
@@ -29,7 +29,7 @@ pub fn load(filename: &str) -> anyhow::Result<Solution> {
             }
             scanner = Some(Scanner::new(line.to_string()));
         } else {
-            scanner = scanner.map(|s| s + ScannerLine::from_str(&line).unwrap());
+            scanner = scanner.map(|s| s + ScannerLine::from_str(line).unwrap());
         }
     }
     if let Some(scanner) = scanner {
@@ -103,7 +103,7 @@ impl Solution {
                         let dy = av.y - rv.y;
                         let dz = av.z - rv.z;
                         let mut tb = r.translate(dx, dy, dz);
-                        let num_overlaps = tb.overlap(&a);
+                        let num_overlaps = tb.overlap(a);
                         if num_overlaps >= 12 {
                             debug!(
                                 "{} overlaps {}: {} (posn: {}, {}, {})",
@@ -168,7 +168,7 @@ impl Scanner {
         self.data
             .iter()
             .fold(Scanner::new(self.name.clone()), |reorientated, line| {
-                reorientated + line.reorientate(&facing, rotation)
+                reorientated + line.reorientate(facing, rotation)
             })
     }
 
