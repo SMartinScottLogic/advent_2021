@@ -319,10 +319,6 @@ mod tests {
             r"-1,-1,1", r"-2,-2,2", r"-3,-3,3", r"-2,-3,1", r"5,6,-4", r"8,0,7",
         ]);
         assert!(has_orientation(&scanner1, &scanner2));
-        let scanner2 = make_scanner(vec![
-            r"1,-1,1", r"2,-2,2", r"3,-3,3", r"2,-1,3", r"-5,4,-6", r"-8,-7,0",
-        ]);
-        assert!(has_orientation(&scanner1, &scanner2));
 
         let scanner2 = make_scanner(vec![
             r"-1,-1,-1",
