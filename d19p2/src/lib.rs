@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use enum_iterator::IntoEnumIterator;
 use log::{debug, trace};
 use regex::Regex;
+use std::cmp::max;
 use std::collections::HashSet;
 use std::fmt;
 use std::fs::File;
@@ -27,9 +28,9 @@ pub fn load(filename: &str) -> anyhow::Result<Solution> {
             if let Some(scanner) = scanner {
                 solution = solution + scanner;
             }
-            scanner = Some(Scanner::new(line.to_string()));
+            scanner = Some(Scanner::empty(line.to_string()));
         } else {
-            scanner = scanner.map(|s| s + ScannerLine::from_str(&line).unwrap());
+            scanner = scanner.map(|s| s + Point::from_str(&line).unwrap());
         }
     }
     if let Some(scanner) = scanner {
@@ -58,6 +59,8 @@ impl Solution {
             let mut changed = false;
             let mut next_data = Vec::new();
             while let Some(mut a) = self.data.pop() {
+            //while self.data.len() > 0 {
+            //    let mut a = self.data.swap_remove(0);
                 let mut inner_next_data = Vec::new();
                 for b in &self.data {
                     let mut new_b = self.calculate_overlap(&a, b);
@@ -67,6 +70,23 @@ impl Solution {
                             a.data.insert(line);
                             changed = true;
                         }
+
+                        debug!("{} had known scanners @ {:?}", new_b.name, new_b.scanners);
+                        for beacon in new_b.scanners {
+                            a.scanners.push((
+                                beacon.0,
+                                beacon.1,
+                            ))
+                        }
+                        debug!(
+                            "{} @ {:?} relative to {}",
+                            new_b.name, new_b.position, a.name
+                        );
+                        a.scanners.push((
+                            new_b.position,
+                            new_b.name,
+                        ));
+
                         debug!("{} len {}", a.name, a.data.len());
                     } else {
                         debug!("retain {}", new_b.name);
@@ -78,13 +98,36 @@ impl Solution {
                 next_data.push(a);
                 self.data = inner_next_data;
             }
+            debug!("data len: {}", next_data.len());
+            self.data = next_data;
             if !changed {
+                self.data.iter().for_each(|scanner| {
+                    debug!(
+                        "{} has known relative scanners: {:?}",
+                        scanner.name, scanner.scanners
+                    );
+                });
                 panic!();
             }
-            self.data = next_data;
-            debug!("data len: {}", self.data.len());
         }
-        self.answer = self.data.get(0).unwrap().data.len() as i64;
+        let a = self.data.get(0).unwrap();
+        debug!("{:?}", a.scanners);
+        println!("{}", a.name);
+        for d in &a.data {
+            println!("{}", d);
+        }
+        let mut max_distance = 0;
+        for lhs in &a.scanners {
+            let distance = lhs.0.x.abs() + lhs.0.y.abs() + lhs.0.z.abs();
+            max_distance = max(max_distance, distance);
+            for rhs in &a.scanners {
+                let distance =
+                    (lhs.0.x - rhs.0.x).abs() + (lhs.0.y - rhs.0.y).abs() + (lhs.0.z - rhs.0.z).abs();
+                max_distance = max(max_distance, distance);
+            }
+        }
+
+        self.answer = max_distance;
     }
 
     pub fn answer(&self) -> Result<i64> {
@@ -110,6 +153,7 @@ impl Solution {
                                 tb.name, a.name, num_overlaps, dx, dy, dz
                             );
                             tb.set_fixed(true);
+                            tb.set_position(dx, dy, dz);
                             for d in &tb.data {
                                 debug!("{}", d);
                             }
@@ -132,32 +176,54 @@ impl Add<Scanner> for Solution {
     }
 }
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, PartialEq)]
 struct Scanner {
     name: String,
-    data: HashSet<ScannerLine>,
+    data: HashSet<Point>,
     fixed: bool,
+
+    position: Point,
+    scanners: Vec<(Point, String)>,
 }
 
 impl Scanner {
-    fn new(line: String) -> Scanner {
+    fn new(name: String, position: Point, scanners: Vec<(Point, String)>) -> Scanner {
         Scanner {
-            name: line,
+            name,
+            position,
+            scanners,
             fixed: false,
-            ..Default::default()
+            data: HashSet::new(),
         }
     }
 
+    fn empty(name: String) -> Scanner {
+        Self::new(name, Point { x: 0, y: 0, z: 0 }, Vec::new())
+    }
+
     fn to_owned(&self) -> Self {
-        self.data
+        let mut other = self.data.iter().fold(
+            Self::new(self.name.clone(), self.position.clone(), Vec::new()),
+            |scanner, line| scanner + line.to_owned(),
+        );
+        other.scanners = self
+            .scanners
             .iter()
-            .fold(Self::new(self.name.clone()), |scanner, line| {
-                scanner + line.to_owned()
-            })
+            .map(|(position, name)| (position.clone(), name.to_owned()))
+            .collect();
+        other
     }
 
     fn set_fixed(&mut self, fixed: bool) {
         self.fixed = fixed;
+    }
+
+    fn set_position(&mut self, dx: i64, dy: i64, dz: i64) {
+        self.position = Point {
+            x: dx,
+            y: dy,
+            z: dz,
+        };
     }
 
     fn is_fixed(&self) -> bool {
@@ -165,19 +231,29 @@ impl Scanner {
     }
 
     fn reorientate(&self, facing: &Facing, rotation: usize) -> Self {
-        self.data
+        let mut other = self.data.iter().fold(
+            Scanner::new(self.name.clone(), self.position.clone(), Vec::new()),
+            |reorientated, line| reorientated + line.reorientate(&facing, rotation),
+        );
+        other.scanners = self
+            .scanners
             .iter()
-            .fold(Scanner::new(self.name.clone()), |reorientated, line| {
-                reorientated + line.reorientate(&facing, rotation)
-            })
+            .map(|(position, name)| (position.reorientate(facing, rotation), name.to_owned()))
+            .collect();
+        other
     }
 
     fn translate(&self, dx: i64, dy: i64, dz: i64) -> Self {
-        self.data
+        let mut other = self.data.iter().fold(
+            Scanner::new(self.name.clone(), self.position.clone(), Vec::new()),
+            |translated, line| translated + line.translate(dx, dy, dz),
+        );
+        other.scanners = self
+            .scanners
             .iter()
-            .fold(Scanner::new(self.name.clone()), |translated, line| {
-                translated + line.translate(dx, dy, dz)
-            })
+            .map(|(position, name)| (position.translate(dx, dy, dz), name.to_owned()))
+            .collect();
+        other
     }
 
     fn overlap(&self, other: &Self) -> usize {
@@ -186,17 +262,17 @@ impl Scanner {
     }
 }
 
-impl Add<ScannerLine> for Scanner {
+impl Add<Point> for Scanner {
     type Output = Self;
 
-    fn add(mut self, other: ScannerLine) -> Self {
+    fn add(mut self, other: Point) -> Self {
         self.data.insert(other);
         self
     }
 }
 
 #[derive(Debug, Default, PartialEq, Hash, Eq)]
-struct ScannerLine {
+struct Point {
     x: i64,
     y: i64,
     z: i64,
@@ -212,7 +288,15 @@ enum Facing {
     NZ,
 }
 
-impl ScannerLine {
+impl Point {
+    fn clone(&self) -> Self {
+        Self {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+        }
+    }
+
     fn to_owned(&self) -> Self {
         Self {
             x: self.x,
@@ -251,7 +335,7 @@ impl ScannerLine {
         }
     }
 }
-impl FromStr for ScannerLine {
+impl FromStr for Point {
     type Err = ParseIntError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -264,12 +348,22 @@ impl FromStr for ScannerLine {
         Ok(Self { x, y, z })
     }
 }
-impl fmt::Display for ScannerLine {
+impl fmt::Display for Point {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{},{},{}", self.x, self.y, self.z)
     }
 }
+impl Add for Point {
+    type Output = Self;
 
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
 #[cfg(test)]
 mod tests {
     use crate::Facing::*;
@@ -284,15 +378,15 @@ mod tests {
     fn make_scanner(input: Vec<&str>) -> Scanner {
         input
             .iter()
-            .fold(Scanner::new("test".to_string()), |scanner, v| {
-                let scanner = scanner + ScannerLine::from_str(v).unwrap();
+            .fold(Scanner::empty("test".to_string()), |scanner, v| {
+                let scanner = scanner + Point::from_str(v).unwrap();
                 scanner
             })
     }
 
     #[test]
     fn line_orientate() {
-        let line = ScannerLine::from_str(r"1,2,3").unwrap();
+        let line = Point::from_str(r"1,2,3").unwrap();
         assert_eq!(line.reorientate(&PX, 0).to_string(), r"1,2,3");
         assert_eq!(line.reorientate(&PY, 0).to_string(), r"-2,1,3");
     }
