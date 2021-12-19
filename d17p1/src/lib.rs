@@ -1,7 +1,6 @@
 use anyhow::{Context, Result};
-use log::{debug, info};
+use log::{debug};
 use regex::Regex;
-use std::arch::x86_64::_mm256_hsubs_epi16;
 use std::cmp::{max, min};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -30,11 +29,6 @@ pub struct Solution {
 }
 
 impl Solution {
-    fn new() -> Self {
-        Self {
-            ..Default::default()
-        }
-    }
 
     pub fn analyse(&mut self) {
         let mut max_height = 0;
