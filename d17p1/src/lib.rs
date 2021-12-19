@@ -38,7 +38,7 @@ impl Solution {
 
     pub fn analyse(&mut self) {
         let mut max_height = 0;
-        for vy in 0..=10000 {
+        for vy in 0..=(10*min(self.sy,self.ey).abs()) {
             for vx in -100..=max(self.sx, self.ex) {
                 match self.simulate(vx, vy) {
                     true => {
