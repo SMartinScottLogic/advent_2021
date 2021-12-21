@@ -1,0 +1,20 @@
+[package]
+name = "d21p1"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# A lightweight logging facade for Rust 
+log = "0.4.14"
+# A logging implementation for `log` which is configured via an environment variable. 
+env_logger = "0.9.0"
+# Flexible concrete Error type built on std::error::Error
+anyhow = "1.0.51"
+# __attribute__((constructor)) for Rust
+ctor = "0.1.21"
+# An implementation of regular expressions for Rust. This implementation uses finite automata and g…
+regex = "1.5.4"
+# Tools to iterate over the variants of a field-less enum
+enum-iterator = "0.7.0"
