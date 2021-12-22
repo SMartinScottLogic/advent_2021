@@ -19,7 +19,12 @@ pub fn load(filename: &str) -> anyhow::Result<Solution> {
         players.entry(player.id).or_insert(player);
     }
     debug!("players: {:?}", players);
-    let world = World::new(players[&1].position, players[&2].position, players[&1].score, players[&1].score);
+    let world = World::new(
+        players[&1].position,
+        players[&2].position,
+        players[&1].score,
+        players[&1].score,
+    );
     solution.worlds.entry(world).or_insert(1);
     Ok(solution)
 }
@@ -41,12 +46,12 @@ struct World {
 }
 
 impl World {
-    fn new(p1_position: i64,
-        p2_position: i64,
-        p1_score: i64,
-        p2_score: i64) -> World {
+    fn new(p1_position: i64, p2_position: i64, p1_score: i64, p2_score: i64) -> World {
         World {
-            p1_position, p2_position, p1_score, p2_score
+            p1_position,
+            p2_position,
+            p1_score,
+            p2_score,
         }
     }
 }
@@ -132,7 +137,12 @@ impl Solution {
                                         player2_score
                                     );
                                 } else {
-                                    let world = World::new(*player1_position, *player1_score, *player2_position, *player2_score);
+                                    let world = World::new(
+                                        *player1_position,
+                                        *player1_score,
+                                        *player2_position,
+                                        *player2_score,
+                                    );
                                     trace!("{:?} {}", world, count);
                                     *new_worlds.entry(world).or_insert(0) += count;
                                 }
