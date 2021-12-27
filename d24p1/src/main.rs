@@ -1,13 +1,24 @@
 use anyhow::Result;
 use d24p1::load;
+use log::info;
+use yansi::Paint;
 
 fn main() -> Result<()> {
     env_logger::init();
 
     let mut solution = load("input.d24p1.full")?;
-    println!("solution: {:?}", solution);
+    info!(
+        "{}{}: {:?}",
+        Paint::masked("🎄 "),
+        Paint::bold(Paint::yellow("solution")),
+        solution
+    );
     solution.analyse();
-    println!("answer is {}", solution.answer()?);
+    info!(
+        "{}answer is {}",
+        Paint::masked("🎅 "),
+        Paint::bold(Paint::red(solution.answer()?))
+    );
 
     Ok(())
 }
