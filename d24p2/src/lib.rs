@@ -11,7 +11,7 @@ type Register = i64;
 pub fn load(filename: &str) -> anyhow::Result<Solution> {
     let file = File::open(filename)?;
 
-    let mut solution = Solution::new();
+    let mut solution = Solution::new(true);
     let reader = BufReader::new(file);
     for line in reader.lines() {
         let instruction = Instruction::from_str(&line?)?;
@@ -26,14 +26,16 @@ pub struct Solution {
     answer: Option<i64>,
     instructions: Vec<Instruction>,
     visited: HashMap<(Alu, usize), Option<i64>>,
+    smallest: bool,
 }
 
 impl Solution {
-    fn new() -> Self {
+    fn new(smallest: bool) -> Self {
         Self {
             answer: None,
             instructions: Vec::new(),
             visited: HashMap::new(),
+            smallest,
         }
     }
 
@@ -65,7 +67,11 @@ impl Solution {
             return *answer;
         }
 
-        let range = [9, 8, 7, 6, 5, 4, 3, 2, 1];
+        let range = if self.smallest {
+            [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        } else {
+            [9, 8, 7, 6, 5, 4, 3, 2, 1]
+        };
         'inputs: for input in range {
             let mut reg = reg;
             let mut pc = pc;

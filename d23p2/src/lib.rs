@@ -390,7 +390,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore="currently_failing"]
+    #[ignore = "currently_failing"]
     fn regression() {
         let m = Solution::possible_moves(r"...B...............B.CDADCA");
         debug!("{:?} moves", m);

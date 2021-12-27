@@ -66,8 +66,7 @@ impl Solution {
 
         self.dump();
         let mut num_passes = 0;
-        loop
-        {
+        loop {
             num_passes += 1;
             let last_changes = self.pass();
             debug!("last_changes: {}", last_changes);
